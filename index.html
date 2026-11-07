@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>iPad画面共有</title>
+<title>画面共有</title>
 
 <style>
 * {
@@ -13,79 +13,136 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f5f7fa;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    sans-serif;
+
+  background:
+    linear-gradient(135deg, #eef5ff, #f7f9fc);
+
   color: #222;
 }
 
 header {
-  background: #1f6feb;
+  background: #2563eb;
   color: white;
-  padding: 18px;
+  padding: 20px;
   text-align: center;
 }
 
 header h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+  padding: 25px 18px;
 }
 
 .card {
   background: white;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,.08);
+  border-radius: 22px;
+  padding: 25px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.08);
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 0;
 }
 
 button {
   width: 100%;
-  border: 0;
-  border-radius: 14px;
   padding: 16px;
+  border: none;
+  border-radius: 14px;
+
+  background: #2563eb;
+  color: white;
+
   font-size: 17px;
   font-weight: bold;
-  background: #1f6feb;
-  color: white;
+
   cursor: pointer;
 }
 
-button.stop {
-  background: #d73a49;
+button:hover {
+  opacity: .9;
 }
 
 button:disabled {
-  opacity: .5;
+  background: #aaa;
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #ddd;
+  border-radius: 14px;
+
+  font-size: 22px;
+  text-align: center;
+
+  letter-spacing: 5px;
+  margin-bottom: 15px;
+}
+
+.mode-buttons {
+  display: grid;
+  gap: 15px;
+}
+
+.mode-button {
+  padding: 22px;
+  font-size: 19px;
+}
+
+.hidden {
+  display: none;
+}
+
+.code {
+  font-size: 42px;
+  font-weight: bold;
+  letter-spacing: 8px;
+
+  text-align: center;
+
+  background: #eef4ff;
+  border-radius: 18px;
+
+  padding: 25px;
+  margin: 20px 0;
 }
 
 .status {
-  margin: 15px 0;
-  padding: 12px;
-  border-radius: 10px;
-  background: #eef3f8;
   text-align: center;
+  padding: 13px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  margin: 15px 0;
 }
 
 video {
   width: 100%;
-  margin-top: 15px;
-  border-radius: 15px;
   background: #000;
-  display: none;
+  border-radius: 18px;
+  margin-top: 15px;
 }
 
-.info {
-  margin-top: 20px;
-  padding: 15px;
-  background: #fff8db;
-  border-radius: 12px;
-  line-height: 1.7;
+.small {
+  color: #666;
   font-size: 14px;
+  line-height: 1.7;
+}
+
+.back {
+  margin-top: 15px;
+  background: #64748b;
 }
 </style>
 </head>
@@ -93,121 +150,735 @@ video {
 <body>
 
 <header>
-  <h1>📱 iPad画面共有</h1>
+  <h1>📱 画面共有</h1>
 </header>
 
 <main>
 
-  <div class="card">
+<!-- モード選択 -->
+<section id="modeSection" class="card">
 
-    <div class="status" id="status">
-      画面共有の準備ができています
-    </div>
+  <h2>何をしますか？</h2>
 
-    <button id="startButton">
-      ▶ 画面共有を開始
+  <div class="mode-buttons">
+
+    <button
+      class="mode-button"
+      onclick="startHostMode()">
+      📱 自分の画面を共有する
     </button>
 
-    <button id="stopButton" class="stop" style="display:none;">
-      ■ 画面共有を停止
+    <button
+      class="mode-button"
+      onclick="startViewerMode()">
+      👀 他の人の画面を見る
     </button>
-
-    <video id="preview" autoplay playsinline muted></video>
-
-    <div class="info">
-      <strong>使い方</strong><br>
-      ①「画面共有を開始」を押す<br>
-      ② Safariに表示される画面共有の確認を行う<br>
-      ③ 共有したい画面を選択する<br>
-      ④ このページに共有画面が表示されます
-    </div>
 
   </div>
 
+</section>
+
+
+<!-- 共有する側 -->
+<section id="hostSection" class="card hidden">
+
+  <h2>📱 画面を共有</h2>
+
+  <p>
+    下のコードを、画面を見る人に伝えてください。
+  </p>
+
+  <div id="roomCode" class="code">
+    ------
+  </div>
+
+  <div id="hostStatus" class="status">
+    接続を待っています
+  </div>
+
+  <button id="shareButton">
+    ▶ 画面共有を開始
+  </button>
+
+  <video
+    id="hostPreview"
+    autoplay
+    playsinline
+    muted>
+  </video>
+
+  <button
+    class="back"
+    onclick="location.reload()">
+    ← 戻る
+  </button>
+
+</section>
+
+
+<!-- 見る側 -->
+<section id="viewerSection" class="card hidden">
+
+  <h2>👀 画面を見る</h2>
+
+  <p>
+    共有する人から教えてもらった
+    6桁コードを入力してください。
+  </p>
+
+  <input
+    id="codeInput"
+    type="text"
+    inputmode="numeric"
+    maxlength="6"
+    placeholder="000000">
+
+  <button id="connectButton">
+    ▶ 接続する
+  </button>
+
+  <div id="viewerStatus" class="status">
+    コードを入力してください
+  </div>
+
+  <video
+    id="remoteVideo"
+    autoplay
+    playsinline
+    controls>
+  </video>
+
+  <button
+    class="back"
+    onclick="location.reload()">
+    ← 戻る
+  </button>
+
+</section>
+
 </main>
 
-<script>
 
-const startButton = document.getElementById("startButton");
-const stopButton = document.getElementById("stopButton");
-const preview = document.getElementById("preview");
-const status = document.getElementById("status");
+<!-- Firebase -->
+<script type="module">
 
-let stream = null;
+import {
+  initializeApp
+} from
+"https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
-startButton.addEventListener("click", async () => {
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  update,
+  onValue,
+  push
+} from
+"https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-  if (!navigator.mediaDevices ||
-      !navigator.mediaDevices.getDisplayMedia) {
+import {
+  getAuth,
+  signInAnonymously
+} from
+"https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-    status.textContent =
-      "このブラウザでは画面共有に対応していません。";
 
-    return;
-  }
+// =================================================
+// Firebase設定
+// =================================================
+//
+// Firebase Consoleで自分のプロジェクトを作成したら
+// ここを書き換える。
+// =================================================
+
+const firebaseConfig = {
+
+  apiKey: "ここにAPI_KEY",
+
+  authDomain:
+    "ここにプロジェクトID.firebaseapp.com",
+
+  databaseURL:
+    "https://ここにプロジェクトID-default-rtdb.firebaseio.com",
+
+  projectId:
+    "ここにプロジェクトID",
+
+  storageBucket:
+    "ここにプロジェクトID.firebasestorage.app",
+
+  messagingSenderId:
+    "ここに送信者ID",
+
+  appId:
+    "ここにAPP_ID"
+
+};
+
+
+// Firebase開始
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+const auth = getAuth(app);
+
+
+// 匿名ログイン
+await signInAnonymously(auth);
+
+
+// =================================================
+// 画面
+// =================================================
+
+const modeSection =
+  document.getElementById("modeSection");
+
+const hostSection =
+  document.getElementById("hostSection");
+
+const viewerSection =
+  document.getElementById("viewerSection");
+
+
+// =================================================
+// WebRTC
+// =================================================
+
+let peerConnection = null;
+
+let localStream = null;
+
+
+// STUNサーバー
+const rtcConfig = {
+
+  iceServers: [
+
+    {
+      urls:
+        "stun:stun.l.google.com:19302"
+    }
+
+  ]
+
+};
+
+
+// =================================================
+// ランダムコード
+// =================================================
+
+function generateCode() {
+
+  return String(
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    )
+  );
+
+}
+
+
+// =================================================
+// 共有する側
+// =================================================
+
+window.startHostMode = async function() {
+
+  modeSection.classList.add("hidden");
+
+  hostSection.classList.remove("hidden");
+
+  const code =
+    generateCode();
+
+  document.getElementById("roomCode")
+    .textContent = code;
+
+  window.roomCode = code;
+
+  document.getElementById("shareButton")
+    .addEventListener(
+      "click",
+      startScreenShare,
+      { once: true }
+    );
+
+};
+
+
+// =================================================
+// 画面共有開始
+// =================================================
+
+async function startScreenShare() {
 
   try {
 
-    status.textContent =
-      "共有する画面を選択してください…";
+    localStream =
+      await navigator.mediaDevices
+        .getDisplayMedia({
 
-    stream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-      audio: true
-    });
+          video: true,
 
-    preview.srcObject = stream;
-    preview.style.display = "block";
+          audio: true
 
-    startButton.style.display = "none";
-    stopButton.style.display = "block";
+        });
 
-    status.textContent =
-      "🟢 画面共有中";
 
-    const videoTrack =
-      stream.getVideoTracks()[0];
+    document.getElementById(
+      "hostPreview"
+    ).srcObject = localStream;
 
-    videoTrack.addEventListener("ended", () => {
-      stopSharing();
-    });
+
+    document.getElementById(
+      "hostStatus"
+    ).textContent =
+      "🟢 画面共有中・接続待ち";
+
+
+    // WebRTC
+    peerConnection =
+      new RTCPeerConnection(
+        rtcConfig
+      );
+
+
+    // 画面をWebRTCへ追加
+    localStream
+      .getTracks()
+      .forEach(track => {
+
+        peerConnection.addTrack(
+          track,
+          localStream
+        );
+
+      });
+
+
+    // ICE候補
+    const candidates = [];
+
+
+    peerConnection
+      .onicecandidate =
+      async event => {
+
+        if (!event.candidate)
+          return;
+
+        candidates.push(
+          event.candidate.toJSON()
+        );
+
+        await set(
+          ref(
+            db,
+            `rooms/${window.roomCode}/hostCandidates`
+          ),
+          candidates
+        );
+
+      };
+
+
+    // Offer作成
+    const offer =
+      await peerConnection
+        .createOffer();
+
+
+    await peerConnection
+      .setLocalDescription(
+        offer
+      );
+
+
+    await set(
+
+      ref(
+        db,
+        `rooms/${window.roomCode}/offer`
+      ),
+
+      {
+        type: offer.type,
+        sdp: offer.sdp
+      }
+
+    );
+
+
+    // ViewerからAnswerが来るのを待つ
+    onValue(
+
+      ref(
+        db,
+        `rooms/${window.roomCode}/answer`
+      ),
+
+      async snapshot => {
+
+        const answer =
+          snapshot.val();
+
+        if (!answer)
+          return;
+
+        if (
+          peerConnection
+            .currentRemoteDescription
+        )
+          return;
+
+
+        await peerConnection
+          .setRemoteDescription(
+            new RTCSessionDescription(
+              answer
+            )
+          );
+
+
+        document.getElementById(
+          "hostStatus"
+        ).textContent =
+          "🟢 接続しました";
+
+      }
+
+    );
+
+
+    // ViewerのICE候補
+    onValue(
+
+      ref(
+        db,
+        `rooms/${window.roomCode}/viewerCandidates`
+      ),
+
+      async snapshot => {
+
+        const data =
+          snapshot.val();
+
+        if (!data)
+          return;
+
+
+        for (
+          const candidate of
+          Object.values(data)
+        ) {
+
+          try {
+
+            await peerConnection
+              .addIceCandidate(
+                new RTCIceCandidate(
+                  candidate
+                )
+              );
+
+          } catch (error) {
+
+            console.log(error);
+
+          }
+
+        }
+
+      }
+
+    );
+
+
+    // 共有終了
+    localStream
+      .getVideoTracks()[0]
+      .addEventListener(
+        "ended",
+        () => {
+
+          document.getElementById(
+            "hostStatus"
+          ).textContent =
+            "画面共有を終了しました";
+
+        }
+      );
+
 
   } catch (error) {
 
     console.error(error);
 
-    status.textContent =
-      "画面共有がキャンセルされました。";
+    document.getElementById(
+      "hostStatus"
+    ).textContent =
+      "画面共有を開始できませんでした";
 
   }
 
-});
+}
 
 
-stopButton.addEventListener("click", () => {
-  stopSharing();
-});
+// =================================================
+// 見る側
+// =================================================
+
+window.startViewerMode = function() {
+
+  modeSection.classList.add("hidden");
+
+  viewerSection.classList.remove("hidden");
+
+};
 
 
-function stopSharing() {
+document.getElementById(
+  "connectButton"
+).addEventListener(
+  "click",
+  connectToHost
+);
 
-  if (stream) {
 
-    stream.getTracks().forEach(track => {
-      track.stop();
-    });
+// =================================================
+// 接続
+// =================================================
 
-    stream = null;
+async function connectToHost() {
+
+  const code =
+    document.getElementById(
+      "codeInput"
+    ).value.trim();
+
+
+  if (
+    !/^\d{6}$/.test(code)
+  ) {
+
+    document.getElementById(
+      "viewerStatus"
+    ).textContent =
+      "6桁のコードを入力してください";
+
+    return;
+
   }
 
-  preview.srcObject = null;
-  preview.style.display = "none";
 
-  startButton.style.display = "block";
-  stopButton.style.display = "none";
+  document.getElementById(
+    "viewerStatus"
+  ).textContent =
+    "接続しています…";
 
-  status.textContent =
-    "画面共有を停止しました。";
+
+  try {
+
+    const roomRef =
+      ref(
+        db,
+        `rooms/${code}`
+      );
+
+
+    const roomSnapshot =
+      await get(roomRef);
+
+
+    if (!roomSnapshot.exists()) {
+
+      document.getElementById(
+        "viewerStatus"
+      ).textContent =
+        "そのコードは見つかりません";
+
+      return;
+
+    }
+
+
+    const room =
+      roomSnapshot.val();
+
+
+    if (!room.offer) {
+
+      document.getElementById(
+        "viewerStatus"
+      ).textContent =
+        "共有する側がまだ画面共有を開始していません";
+
+      return;
+
+    }
+
+
+    peerConnection =
+      new RTCPeerConnection(
+        rtcConfig
+      );
+
+
+    // リモート画面
+    peerConnection
+      .ontrack =
+      event => {
+
+        document.getElementById(
+          "remoteVideo"
+        ).srcObject =
+          event.streams[0];
+
+        document.getElementById(
+          "viewerStatus"
+        ).textContent =
+          "🟢 接続しました";
+
+      };
+
+
+    // ICE候補
+    const candidates = [];
+
+
+    peerConnection
+      .onicecandidate =
+      async event => {
+
+        if (!event.candidate)
+          return;
+
+
+        candidates.push(
+          event.candidate.toJSON()
+        );
+
+
+        await set(
+
+          ref(
+            db,
+            `rooms/${code}/viewerCandidates`
+          ),
+
+          candidates
+
+        );
+
+      };
+
+
+    // Offer
+    await peerConnection
+      .setRemoteDescription(
+
+        new RTCSessionDescription(
+          room.offer
+        )
+
+      );
+
+
+    // Answer
+    const answer =
+      await peerConnection
+        .createAnswer();
+
+
+    await peerConnection
+      .setLocalDescription(
+        answer
+      );
+
+
+    await set(
+
+      ref(
+        db,
+        `rooms/${code}/answer`
+      ),
+
+      {
+
+        type:
+          answer.type,
+
+        sdp:
+          answer.sdp
+
+      }
+
+    );
+
+
+    // HostのICE候補
+    onValue(
+
+      ref(
+        db,
+        `rooms/${code}/hostCandidates`
+      ),
+
+      async snapshot => {
+
+        const data =
+          snapshot.val();
+
+        if (!data)
+          return;
+
+
+        for (
+          const candidate of
+          Object.values(data)
+        ) {
+
+          try {
+
+            await peerConnection
+              .addIceCandidate(
+
+                new RTCIceCandidate(
+                  candidate
+                )
+
+              );
+
+          } catch (error) {
+
+            console.log(error);
+
+          }
+
+        }
+
+      }
+
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById(
+      "viewerStatus"
+    ).textContent =
+      "接続に失敗しました";
+
+  }
+
 }
 
 </script>
