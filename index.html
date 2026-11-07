@@ -191,6 +191,7 @@ window.addEventListener('error',function(e){
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
 <script>
+try{
 if(!window.L){document.body.insertAdjacentHTML('beforeend','<p style="position:fixed;top:5rem;left:1rem;right:1rem;z-index:9999;background:#fff;padding:1rem;border-radius:1rem">地図ライブラリ(Leaflet)を読み込めませんでした。インターネット接続を確認して、ページを開き直してください。</p>');throw new Error('Leaflet not loaded')}
 /* ===== 設定(必要ならここを書き換え) ===== */
 // 多治見西高等学校(多治見市明和町1)付近の概算座標。ずれていたらここを直してください。
@@ -232,6 +233,8 @@ const tiles={
   normal:L.tileLayer(GSI+'std/{z}/{x}/{y}.png',{maxZoom:18,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'}),
   sat:L.tileLayer(GSI+'seamlessphoto/{z}/{x}/{y}.jpg',{maxZoom:18,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'})
 };
+let tileWarned=false;
+Object.values(tiles).forEach(t=>t.on('tileerror',()=>{if(!tileWarned){tileWarned=true;flash('地図画像を読み込めません。通信を確認してください')}}));
 function setMapType(t){Object.values(tiles).forEach(l=>map.removeLayer(l));tiles[t].addTo(map);$('#map').classList.toggle('sat',t==='sat')}
 
 function ringPts(r,n=180){const dLat=r/111320,dLng=r/(111320*Math.cos(CENTER[0]*Math.PI/180));return Array.from({length:n},(_,i)=>{const a=2*Math.PI*i/n;return[CENTER[0]+dLat*Math.cos(a),CENTER[1]+dLng*Math.sin(a)]})}
@@ -552,6 +555,10 @@ S.items.forEach(drawItem);
 if(!S.seeded){S.seeded=true;addNotice('upd','みつばち蜜源マップへようこそ','多治見西高校から3km圏内の蜜源植物を、点と線で登録できます。\n\n「編集」に切り替えて地図をタップすると登録できます。使い方はメニューの「使い方」から見られます。',null,true)}
 updateBadge();setMode('view');
 if(!S.toured)setTimeout(startTour,700);
+}catch(err){
+  var d=document.createElement('pre');d.style.cssText='position:fixed;left:8px;right:8px;top:4rem;z-index:9999;background:#fff;color:#B3372B;border:3px solid #B3372B;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;max-height:60vh;overflow:auto';
+  d.textContent='【エラー内容】\n'+(err&&err.stack?err.stack:err);document.body.appendChild(d);
+}
 </script>
 </body>
 </html>
