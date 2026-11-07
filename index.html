@@ -63,6 +63,10 @@ nav button.on .ic{background:var(--mint);border-radius:1rem;padding:0 .9rem}
 .pop{background:var(--cream);border-radius:1.2rem;width:min(34rem,100%);max-height:min(88dvh,100%);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.35);overflow:hidden;animation:pop .18s ease-out}
 .pop.big{width:min(40rem,100%);height:min(88dvh,100%)}
 @keyframes pop{from{transform:scale(.94);opacity:0}}
+.ov.side{background:transparent;pointer-events:none;justify-content:flex-end;align-items:stretch;padding:0}
+.ov.side .pop{pointer-events:auto;width:min(24rem,92vw);height:100%;max-height:100%;border-radius:1.2rem 0 0 1.2rem;animation:slidein .22s ease-out;box-shadow:-6px 0 24px rgba(0,0,0,.3)}
+@keyframes slidein{from{transform:translateX(100%)}}
+@media (max-width:600px){.ov.side{align-items:flex-end;justify-content:center}.ov.side .pop{width:100%;height:auto;max-height:58dvh;border-radius:1.2rem 1.2rem 0 0;animation:pop .18s ease-out}}
 .pop-h{display:flex;align-items:center;gap:.5rem;padding:.8rem .8rem .7rem 1.2rem;background:var(--mint);border-bottom:1px solid var(--line)}
 .pop-h h2{flex:1;margin:0;font-size:1.15rem;color:var(--leaf-d)}
 .x{border:0;background:#fff;border-radius:50%;width:2.4rem;height:2.4rem;font-size:1.4rem;line-height:1;color:var(--leaf-d)}
@@ -294,6 +298,7 @@ function curve([a,b,c]){
 }
 function drawTmp(){
   tmpLayer.clearLayers();
+  if(tool==='point')return;
   const labels=lineKind==='curve'&&tool==='line'?['始','曲','終']:['1','2'];
   tmp.forEach((p,i)=>{
     const m=L.circleMarker(p,{radius:8,color:'#fff',weight:3,fillColor:'#2F5D3A',fillOpacity:1,interactive:false}).addTo(tmpLayer);
@@ -316,8 +321,8 @@ map.on('click',e=>{
 });
 
 /* ===== ポップオーバー ===== */
-function openPop({title,body,cls='',onClose}){
-  const ov=document.createElement('div');ov.className='ov';
+function openPop({title,body,cls='',onClose,side=false}){
+  const ov=document.createElement('div');ov.className='ov'+(side?' side':'');
   ov.innerHTML=`<div class="pop ${cls}" role="dialog" aria-modal="true"><div class="pop-h"><h2></h2><button class="x" aria-label="閉じる">×</button></div><div class="pop-b"></div></div>`;
   $('h2',ov).textContent=title;
   const pb=$('.pop-b',ov);pb.appendChild(body);
@@ -341,9 +346,17 @@ function openDetail(id){const it=S.items.find(i=>i.id===id);if(it)openEditor(it,
 function openEditor(item,isNew){
   busy=true;updateHint();
   let imgs=[...item.images],locked=!isNew;
+  let pos=item.pts[0],orig=item.pts[0],saved=false,mk=null;
+  const clampLL=ll=>{const d=map.distance(CENTER,ll);if(d<=R)return ll;const k=(R-1)/d;return L.latLng(CENTER[0]+(ll.lat-CENTER[0])*k,CENTER[1]+(ll.lng-CENTER[1])*k)};
+  const onDrag=()=>{const a=mk.getLatLng(),c=clampLL(a);if(c!==a)mk.setLatLng(c);pos=[c.lat,c.lng]};
+  if(item.type==='point'&&mode==='edit'){
+    mk=isNew?L.marker(pos,{icon:pinIcon(safeColor(item.color)),zIndexOffset:1000}).addTo(tmpLayer):layers.get(item.id);
+    if(mk)mk.on('drag',onDrag);
+  }
   const w=el(`
     <label class="f">植物名<input id="f-name" type="text" maxlength="40" placeholder="例:ナナカマド" autocomplete="off"></label>
     <div id="f-err" class="err" hidden></div>
+    <div id="f-drag" class="err" style="color:var(--leaf);margin:-.4rem 0 .9rem" hidden>📍 地図のピンをドラッグすると位置を変えられます(3km圏内)</div>
     <label class="f">ピンの色<input id="f-color" type="color"></label>
     <div class="f">画像を追加(${MAX_IMG}枚まで) <span id="f-cnt" style="font-weight:400"></span>
       <input id="f-file" type="file" accept="image/*" multiple style="display:block;margin-top:.4rem;font-weight:400">
@@ -352,6 +365,7 @@ function openEditor(item,isNew){
     <div class="btns"><button id="b-del" class="ghost danger">削除</button><span class="sp"></span><button id="b-edit" class="ghost">編集</button><button id="b-ok" class="primary">決定</button></div>`);
   const $f=s=>$(s,w);
   $f('#f-name').value=item.name;$f('#f-color').value=safeColor(item.color);$f('#f-note').value=item.note;
+  $f('#f-color').oninput=()=>{if(mk)mk.setIcon(pinIcon(safeColor($f('#f-color').value)))};
   const kind=item.type==='point'?'点':(item.lineKind==='curve'?'曲線':'直線');
   function thumbs(){
     $f('#f-cnt').textContent=`${imgs.length}/${MAX_IMG}`;
@@ -369,6 +383,8 @@ function openEditor(item,isNew){
     $f('#b-edit').disabled=!(locked&&mode==='edit');
     $f('#b-ok').disabled=locked;
     $f('#b-del').hidden=isNew||mode!=='edit';
+    if(mk&&mk.dragging){locked?mk.dragging.disable():mk.dragging.enable()}
+    $f('#f-drag').hidden=locked||!mk;
     thumbs();
   }
   lock();
@@ -384,28 +400,34 @@ function openEditor(item,isNew){
     if(!confirm(`「${item.name}」を削除しますか?`))return;
     S.items=S.items.filter(i=>i.id!==item.id);
     if(layers.has(item.id)){itemGroup.removeLayer(layers.get(item.id));layers.delete(item.id)}
-    save();pop.close();addNotice('del',`「${item.name}」を削除しました`,`${kind}の登録を削除しました。`);
+    save();saved=true;pop.close();addNotice('del',`「${item.name}」を削除しました`,`${kind}の登録を削除しました。`);
   };
   $f('#b-ok').onclick=()=>{
     const name=$f('#f-name').value.trim();
     if(!name){const e=$f('#f-err');e.textContent='植物名を入力してください';e.hidden=false;$f('#f-name').focus();return}
     const now=new Date().toISOString();
     const data={name,color:$f('#f-color').value,images:imgs,note:$f('#f-note').value.trim(),updated:now};
+    if(item.type==='point')data.pts=[pos];
     if(isNew){
       const it=Object.assign({},item,data,{id:uid(),created:now});
       S.items.push(it);drawItem(it);
       if(!save()){S.items.pop();itemGroup.removeLayer(layers.get(it.id));layers.delete(it.id);return}
-      pop.close();
+      saved=true;pop.close();
       const d=Math.round(map.distance(CENTER,it.pts[0])/10)*10;
       addNotice('add',`「${name}」を追加しました`,`${kind}として登録しました。\n学校から約${d}mの位置です。`+(it.note?`\n\nメモ: ${it.note}`:''),it.id);
     }else{
       const it=S.items.find(i=>i.id===item.id);Object.assign(it,data);drawItem(it);
       if(!save())return;
-      pop.close();
-      addNotice('edit',`「${name}」を編集しました`,`${kind}の内容を更新しました。`,it.id);
+      saved=true;pop.close();
+      const moved=item.type==='point'&&(pos[0]!==orig[0]||pos[1]!==orig[1]);
+      addNotice('edit',`「${name}」を編集しました`,`${kind}の内容を更新しました。`+(moved?'\n位置を移動しました。':''),it.id);
     }
   };
-  const pop=openPop({title:isNew?`${kind}を登録`:item.name,body:w,onClose:()=>{busy=false;resetDraw()}});
+  const pop=openPop({title:isNew?`${kind}を登録`:item.name,body:w,side:true,onClose:()=>{
+    busy=false;
+    if(mk){mk.off('drag',onDrag);if(mk.dragging)mk.dragging.disable();if(!isNew&&!saved){mk.setLatLng(orig);mk.setIcon(pinIcon(safeColor(item.color)))}}
+    resetDraw();
+  }});
 }
 
 /* ===== 植物一覧 ===== */
