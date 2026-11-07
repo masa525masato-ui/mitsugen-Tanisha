@@ -2,11 +2,14 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>画面共有</title>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -16,20 +19,17 @@ body {
   font-family:
     -apple-system,
     BlinkMacSystemFont,
-    "Helvetica Neue",
     sans-serif;
 
-  background:
-    linear-gradient(135deg, #eef5ff, #f7f9fc);
-
+  background: #f2f5f8;
   color: #222;
 }
 
 header {
   background: #2563eb;
   color: white;
-  padding: 20px;
   text-align: center;
+  padding: 22px;
 }
 
 header h1 {
@@ -45,10 +45,10 @@ main {
 
 .card {
   background: white;
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 25px;
-  box-shadow: 0 10px 35px rgba(0,0,0,.08);
-  margin-bottom: 20px;
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.08);
 }
 
 h2 {
@@ -57,48 +57,22 @@ h2 {
 
 button {
   width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 14px;
+  border: 0;
+  border-radius: 15px;
 
-  background: #2563eb;
-  color: white;
+  padding: 18px;
 
   font-size: 17px;
   font-weight: bold;
 
-  cursor: pointer;
+  color: white;
+  background: #2563eb;
+
+  margin-top: 12px;
 }
 
-button:hover {
-  opacity: .9;
-}
-
-button:disabled {
-  background: #aaa;
-}
-
-input {
-  width: 100%;
-  padding: 16px;
-  border: 2px solid #ddd;
-  border-radius: 14px;
-
-  font-size: 22px;
-  text-align: center;
-
-  letter-spacing: 5px;
-  margin-bottom: 15px;
-}
-
-.mode-buttons {
-  display: grid;
-  gap: 15px;
-}
-
-.mode-button {
-  padding: 22px;
-  font-size: 19px;
+button:active {
+  transform: scale(.98);
 }
 
 .hidden {
@@ -108,44 +82,55 @@ input {
 .code {
   font-size: 42px;
   font-weight: bold;
-  letter-spacing: 8px;
 
   text-align: center;
 
-  background: #eef4ff;
-  border-radius: 18px;
+  letter-spacing: 8px;
+
+  background: #edf3ff;
+
+  border-radius: 15px;
 
   padding: 25px;
+
   margin: 20px 0;
+}
+
+input {
+  width: 100%;
+
+  padding: 17px;
+
+  border: 2px solid #ddd;
+
+  border-radius: 14px;
+
+  font-size: 24px;
+
+  text-align: center;
+
+  letter-spacing: 5px;
 }
 
 .status {
   text-align: center;
-  padding: 13px;
+
   background: #f1f5f9;
+
   border-radius: 12px;
+
+  padding: 13px;
+
   margin: 15px 0;
 }
 
-video {
-  width: 100%;
-  background: #000;
-  border-radius: 18px;
-  margin-top: 15px;
-}
-
-.small {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
 .back {
-  margin-top: 15px;
   background: #64748b;
 }
+
 </style>
 </head>
+
 
 <body>
 
@@ -153,59 +138,51 @@ video {
   <h1>📱 画面共有</h1>
 </header>
 
+
 <main>
 
-<!-- モード選択 -->
-<section id="modeSection" class="card">
+<!-- 最初の画面 -->
 
-  <h2>何をしますか？</h2>
+<section id="home" class="card">
 
-  <div class="mode-buttons">
+  <h2>画面共有を開始</h2>
 
-    <button
-      class="mode-button"
-      onclick="startHostMode()">
-      📱 自分の画面を共有する
-    </button>
+  <p>
+    どちらを使用しますか？
+  </p>
 
-    <button
-      class="mode-button"
-      onclick="startViewerMode()">
-      👀 他の人の画面を見る
-    </button>
+  <button onclick="showShare()">
+    📱 自分の画面を共有する
+  </button>
 
-  </div>
+  <button onclick="showView()">
+    👀 他の人の画面を見る
+  </button>
 
 </section>
 
 
 <!-- 共有する側 -->
-<section id="hostSection" class="card hidden">
 
-  <h2>📱 画面を共有</h2>
+<section id="share" class="card hidden">
+
+  <h2>📱 自分の画面を共有</h2>
 
   <p>
-    下のコードを、画面を見る人に伝えてください。
+    下のコードを、見る人に伝えてください。
   </p>
 
-  <div id="roomCode" class="code">
-    ------
+  <div id="code" class="code">
+    000000
   </div>
 
-  <div id="hostStatus" class="status">
-    接続を待っています
+  <div class="status">
+    このコードで接続できます
   </div>
 
-  <button id="shareButton">
+  <button onclick="startShare()">
     ▶ 画面共有を開始
   </button>
-
-  <video
-    id="hostPreview"
-    autoplay
-    playsinline
-    muted>
-  </video>
 
   <button
     class="back"
@@ -217,36 +194,30 @@ video {
 
 
 <!-- 見る側 -->
-<section id="viewerSection" class="card hidden">
 
-  <h2>👀 画面を見る</h2>
+<section id="view" class="card hidden">
+
+  <h2>👀 他の人の画面を見る</h2>
 
   <p>
-    共有する人から教えてもらった
+    相手から教えてもらった
     6桁コードを入力してください。
   </p>
 
   <input
-    id="codeInput"
+    id="roomCode"
     type="text"
     inputmode="numeric"
     maxlength="6"
     placeholder="000000">
 
-  <button id="connectButton">
+  <button onclick="connect()">
     ▶ 接続する
   </button>
 
-  <div id="viewerStatus" class="status">
+  <div id="viewStatus" class="status">
     コードを入力してください
   </div>
-
-  <video
-    id="remoteVideo"
-    autoplay
-    playsinline
-    controls>
-  </video>
 
   <button
     class="back"
@@ -259,625 +230,101 @@ video {
 </main>
 
 
-<!-- Firebase -->
-<script type="module">
+<script>
 
-import {
-  initializeApp
-} from
-"https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+function showShare() {
 
-import {
-  getDatabase,
-  ref,
-  set,
-  get,
-  update,
-  onValue,
-  push
-} from
-"https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+  document
+    .getElementById("home")
+    .classList.add("hidden");
 
-import {
-  getAuth,
-  signInAnonymously
-} from
-"https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  document
+    .getElementById("share")
+    .classList.remove("hidden");
+
+  generateCode();
+}
 
 
-// =================================================
-// Firebase設定
-// =================================================
-//
-// Firebase Consoleで自分のプロジェクトを作成したら
-// ここを書き換える。
-// =================================================
+function showView() {
 
-const firebaseConfig = {
+  document
+    .getElementById("home")
+    .classList.add("hidden");
 
-  apiKey: "ここにAPI_KEY",
-
-  authDomain:
-    "ここにプロジェクトID.firebaseapp.com",
-
-  databaseURL:
-    "https://ここにプロジェクトID-default-rtdb.firebaseio.com",
-
-  projectId:
-    "ここにプロジェクトID",
-
-  storageBucket:
-    "ここにプロジェクトID.firebasestorage.app",
-
-  messagingSenderId:
-    "ここに送信者ID",
-
-  appId:
-    "ここにAPP_ID"
-
-};
-
-
-// Firebase開始
-const app = initializeApp(firebaseConfig);
-
-const db = getDatabase(app);
-
-const auth = getAuth(app);
-
-
-// 匿名ログイン
-await signInAnonymously(auth);
-
-
-// =================================================
-// 画面
-// =================================================
-
-const modeSection =
-  document.getElementById("modeSection");
-
-const hostSection =
-  document.getElementById("hostSection");
-
-const viewerSection =
-  document.getElementById("viewerSection");
-
-
-// =================================================
-// WebRTC
-// =================================================
-
-let peerConnection = null;
-
-let localStream = null;
-
-
-// STUNサーバー
-const rtcConfig = {
-
-  iceServers: [
-
-    {
-      urls:
-        "stun:stun.l.google.com:19302"
-    }
-
-  ]
-
-};
-
-
-// =================================================
-// ランダムコード
-// =================================================
-
-function generateCode() {
-
-  return String(
-    Math.floor(
-      100000 +
-      Math.random() * 900000
-    )
-  );
+  document
+    .getElementById("view")
+    .classList.remove("hidden");
 
 }
 
 
-// =================================================
-// 共有する側
-// =================================================
-
-window.startHostMode = async function() {
-
-  modeSection.classList.add("hidden");
-
-  hostSection.classList.remove("hidden");
+function generateCode() {
 
   const code =
-    generateCode();
-
-  document.getElementById("roomCode")
-    .textContent = code;
-
-  window.roomCode = code;
-
-  document.getElementById("shareButton")
-    .addEventListener(
-      "click",
-      startScreenShare,
-      { once: true }
+    Math.floor(
+      100000 +
+      Math.random() * 900000
     );
 
-};
+  document
+    .getElementById("code")
+    .textContent = code;
+
+}
 
 
-// =================================================
-// 画面共有開始
-// =================================================
-
-async function startScreenShare() {
+async function startShare() {
 
   try {
 
-    localStream =
-      await navigator.mediaDevices
+    const stream =
+      await navigator
+        .mediaDevices
         .getDisplayMedia({
-
           video: true,
-
           audio: true
-
         });
 
-
-    document.getElementById(
-      "hostPreview"
-    ).srcObject = localStream;
-
-
-    document.getElementById(
-      "hostStatus"
-    ).textContent =
-      "🟢 画面共有中・接続待ち";
-
-
-    // WebRTC
-    peerConnection =
-      new RTCPeerConnection(
-        rtcConfig
-      );
-
-
-    // 画面をWebRTCへ追加
-    localStream
-      .getTracks()
-      .forEach(track => {
-
-        peerConnection.addTrack(
-          track,
-          localStream
-        );
-
-      });
-
-
-    // ICE候補
-    const candidates = [];
-
-
-    peerConnection
-      .onicecandidate =
-      async event => {
-
-        if (!event.candidate)
-          return;
-
-        candidates.push(
-          event.candidate.toJSON()
-        );
-
-        await set(
-          ref(
-            db,
-            `rooms/${window.roomCode}/hostCandidates`
-          ),
-          candidates
-        );
-
-      };
-
-
-    // Offer作成
-    const offer =
-      await peerConnection
-        .createOffer();
-
-
-    await peerConnection
-      .setLocalDescription(
-        offer
-      );
-
-
-    await set(
-
-      ref(
-        db,
-        `rooms/${window.roomCode}/offer`
-      ),
-
-      {
-        type: offer.type,
-        sdp: offer.sdp
-      }
-
+    alert(
+      "画面共有が開始されました！"
     );
-
-
-    // ViewerからAnswerが来るのを待つ
-    onValue(
-
-      ref(
-        db,
-        `rooms/${window.roomCode}/answer`
-      ),
-
-      async snapshot => {
-
-        const answer =
-          snapshot.val();
-
-        if (!answer)
-          return;
-
-        if (
-          peerConnection
-            .currentRemoteDescription
-        )
-          return;
-
-
-        await peerConnection
-          .setRemoteDescription(
-            new RTCSessionDescription(
-              answer
-            )
-          );
-
-
-        document.getElementById(
-          "hostStatus"
-        ).textContent =
-          "🟢 接続しました";
-
-      }
-
-    );
-
-
-    // ViewerのICE候補
-    onValue(
-
-      ref(
-        db,
-        `rooms/${window.roomCode}/viewerCandidates`
-      ),
-
-      async snapshot => {
-
-        const data =
-          snapshot.val();
-
-        if (!data)
-          return;
-
-
-        for (
-          const candidate of
-          Object.values(data)
-        ) {
-
-          try {
-
-            await peerConnection
-              .addIceCandidate(
-                new RTCIceCandidate(
-                  candidate
-                )
-              );
-
-          } catch (error) {
-
-            console.log(error);
-
-          }
-
-        }
-
-      }
-
-    );
-
-
-    // 共有終了
-    localStream
-      .getVideoTracks()[0]
-      .addEventListener(
-        "ended",
-        () => {
-
-          document.getElementById(
-            "hostStatus"
-          ).textContent =
-            "画面共有を終了しました";
-
-        }
-      );
-
 
   } catch (error) {
 
-    console.error(error);
-
-    document.getElementById(
-      "hostStatus"
-    ).textContent =
-      "画面共有を開始できませんでした";
+    alert(
+      "画面共有がキャンセルされました。"
+    );
 
   }
 
 }
 
 
-// =================================================
-// 見る側
-// =================================================
-
-window.startViewerMode = function() {
-
-  modeSection.classList.add("hidden");
-
-  viewerSection.classList.remove("hidden");
-
-};
-
-
-document.getElementById(
-  "connectButton"
-).addEventListener(
-  "click",
-  connectToHost
-);
-
-
-// =================================================
-// 接続
-// =================================================
-
-async function connectToHost() {
+function connect() {
 
   const code =
-    document.getElementById(
-      "codeInput"
-    ).value.trim();
-
+    document
+      .getElementById("roomCode")
+      .value;
 
   if (
-    !/^\d{6}$/.test(code)
+    code.length !== 6
   ) {
 
-    document.getElementById(
-      "viewerStatus"
-    ).textContent =
-      "6桁のコードを入力してください";
+    document
+      .getElementById("viewStatus")
+      .textContent =
+      "6桁のコードを入力してください。";
 
     return;
 
   }
 
-
-  document.getElementById(
-    "viewerStatus"
-  ).textContent =
-    "接続しています…";
-
-
-  try {
-
-    const roomRef =
-      ref(
-        db,
-        `rooms/${code}`
-      );
-
-
-    const roomSnapshot =
-      await get(roomRef);
-
-
-    if (!roomSnapshot.exists()) {
-
-      document.getElementById(
-        "viewerStatus"
-      ).textContent =
-        "そのコードは見つかりません";
-
-      return;
-
-    }
-
-
-    const room =
-      roomSnapshot.val();
-
-
-    if (!room.offer) {
-
-      document.getElementById(
-        "viewerStatus"
-      ).textContent =
-        "共有する側がまだ画面共有を開始していません";
-
-      return;
-
-    }
-
-
-    peerConnection =
-      new RTCPeerConnection(
-        rtcConfig
-      );
-
-
-    // リモート画面
-    peerConnection
-      .ontrack =
-      event => {
-
-        document.getElementById(
-          "remoteVideo"
-        ).srcObject =
-          event.streams[0];
-
-        document.getElementById(
-          "viewerStatus"
-        ).textContent =
-          "🟢 接続しました";
-
-      };
-
-
-    // ICE候補
-    const candidates = [];
-
-
-    peerConnection
-      .onicecandidate =
-      async event => {
-
-        if (!event.candidate)
-          return;
-
-
-        candidates.push(
-          event.candidate.toJSON()
-        );
-
-
-        await set(
-
-          ref(
-            db,
-            `rooms/${code}/viewerCandidates`
-          ),
-
-          candidates
-
-        );
-
-      };
-
-
-    // Offer
-    await peerConnection
-      .setRemoteDescription(
-
-        new RTCSessionDescription(
-          room.offer
-        )
-
-      );
-
-
-    // Answer
-    const answer =
-      await peerConnection
-        .createAnswer();
-
-
-    await peerConnection
-      .setLocalDescription(
-        answer
-      );
-
-
-    await set(
-
-      ref(
-        db,
-        `rooms/${code}/answer`
-      ),
-
-      {
-
-        type:
-          answer.type,
-
-        sdp:
-          answer.sdp
-
-      }
-
-    );
-
-
-    // HostのICE候補
-    onValue(
-
-      ref(
-        db,
-        `rooms/${code}/hostCandidates`
-      ),
-
-      async snapshot => {
-
-        const data =
-          snapshot.val();
-
-        if (!data)
-          return;
-
-
-        for (
-          const candidate of
-          Object.values(data)
-        ) {
-
-          try {
-
-            await peerConnection
-              .addIceCandidate(
-
-                new RTCIceCandidate(
-                  candidate
-                )
-
-              );
-
-          } catch (error) {
-
-            console.log(error);
-
-          }
-
-        }
-
-      }
-
-    );
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    document.getElementById(
-      "viewerStatus"
-    ).textContent =
-      "接続に失敗しました";
-
-  }
+  document
+    .getElementById("viewStatus")
+    .textContent =
+    "接続準備中…";
 
 }
 
