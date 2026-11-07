@@ -194,8 +194,8 @@ window.addEventListener('error',function(e){
 try{
 if(!window.L){document.body.insertAdjacentHTML('beforeend','<p style="position:fixed;top:5rem;left:1rem;right:1rem;z-index:9999;background:#fff;padding:1rem;border-radius:1rem">地図ライブラリ(Leaflet)を読み込めませんでした。インターネット接続を確認して、ページを開き直してください。</p>');throw new Error('Leaflet not loaded')}
 /* ===== 設定(必要ならここを書き換え) ===== */
-// 多治見西高等学校(多治見市明和町1)付近の概算座標。ずれていたらここを直してください。
-const CENTER=[35.3275,137.1245];
+// 多治見西高等学校(多治見市明和町1丁目18)の座標。
+const CENTER=[35.351804,137.10176];
 const R=3000;               // 登録できる範囲(m)
 const RINGS=[500,1000,2000,3000];
 const MAX_IMG=5;
