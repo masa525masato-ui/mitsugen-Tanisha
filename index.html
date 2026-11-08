@@ -1,334 +1,916 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>画面共有</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>みつばち蜜源マップ</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="anonymous">
 <style>
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
-
-  background: #f2f5f8;
-  color: #222;
-}
-
-header {
-  background: #2563eb;
-  color: white;
-  text-align: center;
-  padding: 22px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-main {
-  max-width: 600px;
-  margin: auto;
-  padding: 25px 18px;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow:
-    0 8px 30px rgba(0,0,0,.08);
-}
-
-h2 {
-  margin-top: 0;
-}
-
-button {
-  width: 100%;
-  border: 0;
-  border-radius: 15px;
-
-  padding: 18px;
-
-  font-size: 17px;
-  font-weight: bold;
-
-  color: white;
-  background: #2563eb;
-
-  margin-top: 12px;
-}
-
-button:active {
-  transform: scale(.98);
-}
-
-.hidden {
-  display: none;
-}
-
-.code {
-  font-size: 42px;
-  font-weight: bold;
-
-  text-align: center;
-
-  letter-spacing: 8px;
-
-  background: #edf3ff;
-
-  border-radius: 15px;
-
-  padding: 25px;
-
-  margin: 20px 0;
-}
-
-input {
-  width: 100%;
-
-  padding: 17px;
-
-  border: 2px solid #ddd;
-
-  border-radius: 14px;
-
-  font-size: 24px;
-
-  text-align: center;
-
-  letter-spacing: 5px;
-}
-
-.status {
-  text-align: center;
-
-  background: #f1f5f9;
-
-  border-radius: 12px;
-
-  padding: 13px;
-
-  margin: 15px 0;
-}
-
-.back {
-  background: #64748b;
-}
-
+:root{--honey:#F2B01E;--honey-d:#B77F00;--leaf:#2F5D3A;--leaf-d:#1F4129;--mint:#E7F0D8;--cream:#FFFCF0;--ink:#1D2A21;--mut:#5E6F63;--line:#D9E2CB;--ring:#2F5D3A;--danger:#B3372B}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;height:100vh;height:100dvh;display:flex;flex-direction:column;font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;color:var(--ink);background:var(--cream);overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+/* header */
+header{flex:none;display:flex;align-items:center;gap:.4rem;background:var(--leaf);color:#fff;padding:env(safe-area-inset-top) .5rem 0;height:calc(3.5rem + env(safe-area-inset-top));position:relative;z-index:20}
+header h1{flex:1;margin:0;font-size:1.1rem;display:flex;align-items:center;gap:.5rem;letter-spacing:.02em}
+.ib{width:2.9rem;height:2.9rem;border:0;border-radius:.8rem;background:transparent;color:#fff;display:grid;place-items:center;position:relative}
+.ib:active{background:rgba(255,255,255,.18)}
+.ib svg{width:1.6rem;height:1.6rem}
+#badge{position:absolute;top:.25rem;right:.2rem;min-width:1.15rem;height:1.15rem;border-radius:.6rem;background:var(--honey);color:var(--leaf-d);font-size:.7rem;font-weight:700;display:grid;place-items:center;padding:0 .25rem}
+/* map */
+#mapwrap{flex:1;position:relative;min-height:20rem}
+#map{position:absolute;inset:0;isolation:isolate;background:#dfe8d2}
+.leaflet-top.leaflet-right{margin-top:.2rem}
+.ring{stroke:var(--ring)}
+#map.sat{--ring:#FFE680}
+.ringlab{pointer-events:none}
+.ringlab span{position:absolute;transform:translate(-50%,-50%);background:#fff;color:var(--leaf-d);border:1.5px solid var(--leaf);border-radius:1rem;padding:.05rem .5rem;font-size:.78rem;font-weight:700;white-space:nowrap}
+.school{pointer-events:none}
+.school span{position:absolute;transform:translate(-50%,-50%);width:2.1rem;height:2.1rem;border-radius:50%;background:var(--leaf);color:#fff;border:3px solid #fff;display:grid;place-items:center;font-weight:700;font-size:.95rem;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.handle span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--honey);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .1s}
+.handle.st span{background:#2F8A4A}
+.handle.en span{background:#C8402F}
+.handle.bd span{background:var(--honey)}
+.handle.mv span{background:#fff;border-color:var(--leaf)}
+.handle.mv svg{width:18px;height:18px}
+.handle.sel span{box-shadow:0 0 0 4px #1D2A21,0 2px 6px rgba(0,0,0,.4);transform:scale(1.15)}
+.pin svg{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.tmplab{background:var(--honey);border:2px solid #fff;color:var(--leaf-d);font-weight:700;padding:0 .35rem;border-radius:.6rem;box-shadow:none}
+.tmplab:before{display:none}
+/* hint + fab */
+#hint{position:absolute;z-index:30;top:4rem;left:50%;transform:translateX(-50%);background:var(--leaf-d);color:#fff;border-radius:2rem;padding:.35rem .5rem .35rem 1rem;display:flex;align-items:center;gap:.3rem;font-size:.9rem;box-shadow:0 3px 10px rgba(0,0,0,.25);max-width:calc(100% - 5rem);white-space:nowrap}
+#hint button{border:0;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:1.7rem;height:1.7rem;font-size:1rem;line-height:1}
+.mb{border:0;background:transparent;padding:.55rem .95rem;min-height:2.75rem;font-weight:700;color:var(--leaf);display:flex;align-items:center;gap:.4rem;border-radius:.75rem}
+#fcnt{background:var(--honey);color:var(--leaf-d);border-radius:1rem;min-width:1.4rem;height:1.4rem;display:grid;place-items:center;font-size:.78rem;font-style:normal;padding:0 .3rem}
+#fwrap{position:absolute;z-index:30;top:.6rem;left:.8rem}
+.loc{width:3.1rem;height:3.1rem;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.25);display:grid;place-items:center}
+.loc svg{width:1.6rem;height:1.6rem}
+.loc[aria-pressed=true]{background:#2a7de1}
+.loc[aria-pressed=true] svg{stroke:#fff}
+.frow{display:flex;align-items:center;gap:.8rem;padding:.75rem .4rem;border-bottom:1px solid var(--line);font-weight:700;cursor:pointer}
+.frow input{width:1.4rem;height:1.4rem;accent-color:var(--leaf);flex:none}
+.frow i{width:1.1rem;height:1.1rem;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);flex:none}
+.frow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow small{color:var(--mut);font-weight:400}
+#fab{position:absolute;z-index:30;right:.8rem;bottom:.9rem;display:flex;flex-direction:column;align-items:flex-end;gap:.55rem}
+.panel{background:#fff;border-radius:1rem;box-shadow:0 3px 12px rgba(0,0,0,.25);padding:.3rem;display:flex;gap:.25rem}
+.seg button{border:0;background:transparent;border-radius:.75rem;padding:.55rem .9rem;min-height:2.75rem;font-weight:700;color:var(--mut)}
+.seg button[aria-pressed=true]{background:var(--leaf);color:#fff}
+#mode button[data-m=edit][aria-pressed=true]{background:var(--honey);color:var(--leaf-d)}
+/* nav */
+nav{flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);position:relative;z-index:20}
+nav button{border:0;background:transparent;padding:.45rem 0 .4rem;display:flex;flex-direction:column;align-items:center;gap:.1rem;font-size:.74rem;color:var(--mut);min-height:3.6rem}
+nav button .ic{font-size:1.35rem;line-height:1.4rem}
+nav button.on{color:var(--leaf);font-weight:700}
+nav button.on .ic{background:var(--mint);border-radius:1rem;padding:0 .9rem}
+/* drawer */
+#scrim{position:fixed;inset:0;background:rgba(20,35,25,.45);z-index:1500;opacity:0;pointer-events:none;transition:opacity .22s}
+#scrim.open{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;bottom:0;left:0;width:min(19rem,82vw);background:var(--cream);z-index:1600;transform:translateX(-102%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:4px 0 18px rgba(0,0,0,.25);padding-bottom:env(safe-area-inset-bottom)}
+#drawer.open{transform:none}
+#drawer .dh{background:var(--leaf);color:#fff;padding:calc(1.2rem + env(safe-area-inset-top)) 1.2rem 1.2rem}
+#drawer .dh b{display:block;font-size:1.2rem;margin-top:.5rem}
+#drawer .dh small{opacity:.85}
+#drawer ul{list-style:none;margin:.5rem 0;padding:0 .6rem}
+#drawer li button{width:100%;border:0;background:transparent;text-align:left;display:flex;align-items:center;gap:.9rem;padding:.9rem .8rem;border-radius:.9rem;font-size:1.05rem}
+#drawer li button:active{background:var(--mint)}
+/* popover */
+.ov{position:fixed;inset:0;background:rgba(20,35,25,.45);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:2000}
+.pop{background:var(--cream);border-radius:1.2rem;width:min(34rem,100%);max-height:min(88dvh,100%);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.35);overflow:hidden;animation:pop .18s ease-out}
+.pop.big{width:min(40rem,100%);height:min(88dvh,100%)}
+@keyframes pop{from{transform:scale(.94);opacity:0}}
+.ov.side{background:transparent;pointer-events:none;justify-content:flex-end;align-items:stretch;padding:0}
+.ov.side .pop{pointer-events:auto;width:min(24rem,92vw);height:100%;max-height:100%;border-radius:1.2rem 0 0 1.2rem;animation:slidein .22s ease-out;box-shadow:-6px 0 24px rgba(0,0,0,.3)}
+@keyframes slidein{from{transform:translateX(100%)}}
+@media (max-width:600px){.ov.side{align-items:flex-end;justify-content:center}.ov.side .pop{width:100%;height:auto;max-height:58dvh;border-radius:1.2rem 1.2rem 0 0;animation:pop .18s ease-out}}
+.pop-h{display:flex;align-items:center;gap:.5rem;padding:.8rem .8rem .7rem 1.2rem;background:var(--mint);border-bottom:1px solid var(--line)}
+.pop-h h2{flex:1;margin:0;font-size:1.15rem;color:var(--leaf-d)}
+.x{border:0;background:#fff;border-radius:50%;width:2.4rem;height:2.4rem;font-size:1.4rem;line-height:1;color:var(--leaf-d)}
+.pop-b{padding:1rem 1.2rem 1.3rem;overflow:auto;-webkit-overflow-scrolling:touch}
+/* forms */
+.f{display:block;margin-bottom:1rem;font-weight:700;font-size:.92rem;color:var(--leaf-d)}
+.f input[type=text],.f input[type=search],.f textarea,.f select{display:block;width:100%;margin-top:.35rem;padding:.7rem .8rem;border:1.5px solid var(--line);border-radius:.8rem;background:#fff;font-weight:400;font-size:1rem}
+.f input:disabled,.f textarea:disabled{background:#F1F3EA;color:var(--ink);opacity:1}
+.f input[type=color]{display:block;margin-top:.35rem;width:100%;height:3rem;border:1.5px solid var(--line);border-radius:.8rem;background:#fff;padding:.2rem}
+.thumbs{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.th{position:relative;width:4.6rem;height:4.6rem}
+.th>button:first-child{width:100%;height:100%;border:0;padding:0;border-radius:.7rem;overflow:hidden;background:var(--mint)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th .rm{position:absolute;top:-.4rem;right:-.4rem;width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid #fff;background:var(--danger);color:#fff;line-height:1}
+.btns{display:flex;gap:.6rem;align-items:center;margin-top:.4rem}
+.sp{flex:1}
+.primary,.ghost{border-radius:.9rem;padding:.7rem 1.2rem;min-height:2.9rem;font-weight:700;border:2px solid var(--leaf)}
+.primary{background:var(--leaf);color:#fff}
+.ghost{background:#fff;color:var(--leaf)}
+.ghost.danger{border-color:var(--danger);color:var(--danger)}
+button:disabled{opacity:.4;cursor:default}
+.err{color:var(--danger);font-size:.88rem;margin:-.5rem 0 .8rem}
+/* コンパクト表示(植物一覧・表示する植物) */
+.pop.compact{width:max(68vw,min(32rem,100%));max-width:100%;height:84dvh}
+@media (max-width:700px){.pop.compact{width:100%;height:88dvh}}
+.compact .pop-h{padding:.4rem .5rem .4rem 1rem}
+.compact .pop-h h2{font-size:1rem}
+.compact .x{width:2.1rem;height:2.1rem;font-size:1.25rem}
+.compact .pop-b{padding:.6rem .8rem .8rem}
+.compact .filters{grid-template-columns:repeat(3,1fr);gap:.35rem;margin-bottom:.5rem}
+.compact .filters .f{font-size:.72rem}
+.compact .filters .f select,.compact .filters .f input[type=search]{margin-top:.15rem;padding:.4rem .5rem;font-size:.88rem;border-radius:.6rem}
+.compact .filters .chk{grid-column:auto;font-size:.8rem;align-self:end;min-height:2.2rem}
+.compact .filters .chk input{width:1.1rem;height:1.1rem}
+.compact .cnt{margin:.1rem 0 .35rem;font-size:.78rem}
+.compact .btns{margin:0 0 .4rem!important;gap:.4rem}
+.compact .btns .ghost{padding:.35rem .6rem;min-height:2.2rem;font-size:.82rem;flex:1;border-width:1.5px}
+.compact .card{padding:.3rem .5rem;margin-bottom:.3rem;border-radius:.75rem;gap:.6rem}
+.compact .card .im{width:2.5rem;height:2.5rem;border-radius:.6rem}
+.compact .card .im i{width:1.1rem;height:1.1rem;border-width:2px}
+.compact .card b{font-size:.92rem}
+.compact .card small{font-size:.74rem}
+.compact .frow{padding:.4rem .3rem;gap:.6rem;font-size:.92rem}
+.compact .frow input{width:1.2rem;height:1.2rem}
+.compact .frow i{width:.95rem;height:.95rem}
+.compact .empty{padding:1.2rem .5rem}
+/* アコーディオン */
+.acc{border:1.5px solid var(--line);border-radius:.8rem;margin-bottom:.4rem;background:#fff;overflow:hidden}
+.acc-h{display:flex;align-items:center;gap:.6rem;padding:.2rem .6rem}
+.nm-cb{width:1.3rem;height:1.3rem;accent-color:var(--leaf);flex:none}
+.acc-t{flex:1;min-width:0;display:flex;align-items:center;gap:.6rem;border:0;background:transparent;padding:.45rem 0;font-weight:700;text-align:left;font-size:.95rem}
+.acc-t i{width:1rem;height:1rem;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);flex:none}
+.acc-t .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-t small{color:var(--mut);font-weight:400;font-size:.76rem;white-space:nowrap}
+.chev{color:var(--mut);transition:transform .15s}
+.acc.open .chev{transform:rotate(90deg)}
+.acc-b{display:none;border-top:1px solid var(--line);background:#FBFCF5;padding:.15rem .7rem .4rem}
+.acc.open .acc-b{display:block}
+.irow{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px dashed var(--line)}
+.irow:last-child{border:0}
+.irow label{flex:1;min-width:0;display:flex;align-items:center;gap:.6rem;font-size:.86rem}
+.irow input{width:1.2rem;height:1.2rem;accent-color:var(--leaf);flex:none}
+.irow .ty{background:var(--mint);border-radius:1rem;padding:0 .5rem;font-size:.72rem;font-weight:700;color:var(--leaf-d);flex:none}
+.irow small{color:var(--mut)}
+.irow.dim{opacity:.55}
+.irow .go{padding:.15rem .7rem;min-height:2rem;font-size:.8rem;border-width:1.5px}
+/* lists */
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem}
+.filters .f{margin:0}
+.filters .wide{grid-column:1/-1}
+.chk{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--leaf-d);font-size:.92rem}
+.chk input{width:1.3rem;height:1.3rem;accent-color:var(--leaf)}
+.cnt{color:var(--mut);font-size:.85rem;margin:.2rem 0 .6rem}
+.card{width:100%;display:flex;gap:.8rem;align-items:center;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:1rem;padding:.6rem;margin-bottom:.55rem}
+.card:active{background:var(--mint)}
+.card .im{flex:none;width:3.6rem;height:3.6rem;border-radius:.8rem;background:var(--mint);overflow:hidden;display:grid;place-items:center}
+.card .im img{width:100%;height:100%;object-fit:cover}
+.card .im i{width:1.4rem;height:1.4rem;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.card b{display:block}
+.card small{color:var(--mut)}
+.card .tx{flex:1;min-width:0}
+.card .tx b,.card .tx small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.empty{text-align:center;color:var(--mut);padding:2rem 1rem;line-height:1.7}
+.nt{position:relative}
+.nt .dot{position:absolute;top:.55rem;right:.6rem;width:.7rem;height:.7rem;border-radius:50%;background:var(--honey)}
+.nt .tx small.pv{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.chip{display:inline-block;font-size:.72rem;font-weight:700;border-radius:1rem;padding:.05rem .55rem;background:var(--mint);color:var(--leaf-d);margin-right:.35rem}
+.chip.add{background:#DDEFD0}.chip.edit{background:#FFF0C2;color:#7A5600}.chip.del{background:#F7DAD5;color:var(--danger)}.chip.upd{background:#D8E8F7;color:#1F4E7A}
+.nbody{white-space:pre-wrap;line-height:1.8;font-size:1.05rem;margin:1rem 0}
+/* settings */
+.set{padding:.2rem 0 1rem;border-bottom:1px solid var(--line);margin-bottom:1rem}
+.set:last-child{border:0;margin:0}
+.set h3{margin:0 0 .6rem;font-size:1rem;color:var(--leaf-d)}
+.seg.full{display:flex;background:#fff;border:1.5px solid var(--line);border-radius:1rem;padding:.25rem}
+.seg.full button{flex:1}
+input[type=range]{width:100%;accent-color:var(--leaf);height:2rem}
+.row{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.sw{position:relative;width:3.4rem;height:2rem;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;width:100%;height:100%;z-index:2}
+.sw i{position:absolute;inset:0;border-radius:2rem;background:#C8CFBD;transition:.2s}
+.sw i:after{content:"";position:absolute;top:.2rem;left:.2rem;width:1.6rem;height:1.6rem;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+i{background:var(--leaf)}
+.sw input:checked+i:after{transform:translateX(1.4rem)}
+/* toast */
+#toasts{position:fixed;top:calc(3.9rem + env(safe-area-inset-top));right:.8rem;left:auto;z-index:3000;display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;pointer-events:none;width:min(22rem,calc(100vw - 1.6rem))}
+.toast{pointer-events:auto;background:var(--leaf-d);color:#fff;border-radius:1rem;padding:.7rem 1rem;width:100%;box-shadow:0 6px 18px rgba(0,0,0,.3);animation:tin .25s ease-out;border-left:6px solid var(--honey);font-size:.92rem;transition:opacity 1.6s linear}
+.toast.fade{opacity:0}
+.toast b{display:block}
+.toast.warn{background:var(--danger);border-color:#fff}
+@keyframes tin{from{transform:translateX(1.5rem);opacity:0}}
+/* coach */
+#coach{position:fixed;inset:0;z-index:5000}
+#spot{position:fixed;border-radius:1rem;box-shadow:0 0 0 100vmax rgba(20,35,25,.68);border:3px solid var(--honey);transition:all .25s ease;pointer-events:none}
+#bubble{position:fixed;width:min(21rem,calc(100vw - 1.5rem));background:var(--cream);border-radius:1.1rem;padding:1rem 1.1rem;box-shadow:0 8px 28px rgba(0,0,0,.4);line-height:1.7}
+#bubble p{margin:0 0 .8rem}
+#bubble .btns{margin:0}
+#bubble small{color:var(--mut)}
 </style>
 </head>
-
-
 <body>
-
 <header>
-  <h1>📱 画面共有</h1>
+  <button class="ib" id="btn-menu" aria-label="メニューを開く"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <h1><svg width="26" height="26" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/><polygon points="12,7 16.5,9.5 16.5,14.5 12,17 7.5,14.5 7.5,9.5" fill="#2F5D3A"/></svg>みつばち蜜源マップ</h1>
+  <button class="ib" id="btn-bell" aria-label="お知らせ"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 1 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/></svg><span id="badge" hidden>0</span></button>
 </header>
 
-
-<main>
-
-<!-- 最初の画面 -->
-
-<section id="home" class="card">
-
-  <h2>画面共有を開始</h2>
-
-  <p>
-    どちらを使用しますか？
-  </p>
-
-  <button onclick="showShare()">
-    📱 自分の画面を共有する
-  </button>
-
-  <button onclick="showView()">
-    👀 他の人の画面を見る
-  </button>
-
-</section>
-
-
-<!-- 共有する側 -->
-
-<section id="share" class="card hidden">
-
-  <h2>📱 自分の画面を共有</h2>
-
-  <p>
-    下のコードを、見る人に伝えてください。
-  </p>
-
-  <div id="code" class="code">
-    000000
+<div id="mapwrap">
+  <div id="map"></div>
+  <div class="panel" id="fwrap"><button class="mb" id="btn-filter" aria-label="表示する植物を選ぶ">▽ フィルター<i id="fcnt" hidden>0</i></button></div>
+  <div id="hint" hidden><span id="hint-t"></span><button id="hint-x" aria-label="やり直す" hidden>↺</button></div>
+  <div id="fab">
+    <button class="loc" id="btn-loc" aria-label="現在地を表示" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="#2a7de1" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+    <div id="tools" hidden>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+        <div class="panel seg" id="here"><button id="b-here">📍 現在地に登録</button></div>
+        <div class="panel seg" id="kinds" hidden>
+          <button data-kind="straight" aria-pressed="true">直線</button>
+          <button data-kind="curve" aria-pressed="false">曲線</button>
+        </div>
+        <div class="panel seg" id="tool">
+          <button data-tool="point" aria-pressed="true">● 点</button>
+          <button data-tool="line" aria-pressed="false">╱ 線</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel seg" id="mode">
+      <button data-m="view" aria-pressed="true">閲覧</button>
+      <button data-m="edit" aria-pressed="false">編集</button>
+    </div>
   </div>
-
-  <div class="status">
-    このコードで接続できます
-  </div>
-
-  <button onclick="startShare()">
-    ▶ 画面共有を開始
-  </button>
-
-  <button
-    class="back"
-    onclick="location.reload()">
-    ← 戻る
-  </button>
-
-</section>
+</div>
 
 
-<!-- 見る側 -->
+<div id="scrim"></div>
+<aside id="drawer" aria-hidden="true">
+  <div class="dh"><svg width="34" height="34" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/></svg><b>みつばち蜜源マップ</b><small>多治見西高等学校 周辺3km ・ v1.10</small></div>
+  <ul>
+    <li><button data-go="plants"><span>🌿</span>植物一覧</button></li>
+    <li><button data-go="settings"><span>⚙️</span>設定</button></li>
+    <li><button data-go="notices"><span>🔔</span>お知らせ</button></li>
+    <li><button data-go="help"><span>💡</span>使い方</button></li>
+  </ul>
+</aside>
 
-<section id="view" class="card hidden">
-
-  <h2>👀 他の人の画面を見る</h2>
-
-  <p>
-    相手から教えてもらった
-    6桁コードを入力してください。
-  </p>
-
-  <input
-    id="roomCode"
-    type="text"
-    inputmode="numeric"
-    maxlength="6"
-    placeholder="000000">
-
-  <button onclick="connect()">
-    ▶ 接続する
-  </button>
-
-  <div id="viewStatus" class="status">
-    コードを入力してください
-  </div>
-
-  <button
-    class="back"
-    onclick="location.reload()">
-    ← 戻る
-  </button>
-
-</section>
-
-</main>
-
+<div id="toasts"></div>
+<div id="coach" hidden><div id="spot"></div><div id="bubble"></div></div>
 
 <script>
-
-function showShare() {
-
-  document
-    .getElementById("home")
-    .classList.add("hidden");
-
-  document
-    .getElementById("share")
-    .classList.remove("hidden");
-
-  generateCode();
-}
-
-
-function showView() {
-
-  document
-    .getElementById("home")
-    .classList.add("hidden");
-
-  document
-    .getElementById("view")
-    .classList.remove("hidden");
-
-}
-
-
-function generateCode() {
-
-  const code =
-    Math.floor(
-      100000 +
-      Math.random() * 900000
-    );
-
-  document
-    .getElementById("code")
-    .textContent = code;
-
-}
-
-
-async function startShare() {
-
-  try {
-
-    const stream =
-      await navigator
-        .mediaDevices
-        .getDisplayMedia({
-          video: true,
-          audio: true
-        });
-
-    alert(
-      "画面共有が開始されました！"
-    );
-
-  } catch (error) {
-
-    alert(
-      "画面共有がキャンセルされました。"
-    );
-
-  }
-
-}
-
-
-function connect() {
-
-  const code =
-    document
-      .getElementById("roomCode")
-      .value;
-
-  if (
-    code.length !== 6
-  ) {
-
-    document
-      .getElementById("viewStatus")
-      .textContent =
-      "6桁のコードを入力してください。";
-
-    return;
-
-  }
-
-  document
-    .getElementById("viewStatus")
-    .textContent =
-    "接続準備中…";
-
-}
-
+window.addEventListener('error',function(e){
+  var d=document.getElementById('errbox');
+  if(!d){d=document.createElement('pre');d.id='errbox';d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#B3372B;color:#fff;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;max-height:40vh;overflow:auto';document.body.appendChild(d)}
+  d.textContent+=(e.message||'error')+(e.lineno?' (行'+e.lineno+')':'')+'\n';
+});
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
+<script>
+try{
+if(!window.L){document.body.insertAdjacentHTML('beforeend','<p style="position:fixed;top:5rem;left:1rem;right:1rem;z-index:9999;background:#fff;padding:1rem;border-radius:1rem">地図ライブラリ(Leaflet)を読み込めませんでした。インターネット接続を確認して、ページを開き直してください。</p>');throw new Error('Leaflet not loaded')}
+/* ===== 設定(必要ならここを書き換え) ===== */
+// 多治見西高等学校(多治見市明和町1丁目18)の座標。
+const CENTER=[35.351804,137.10176];
+const R=3000;               // 登録できる範囲(m)
+const RINGS=[500,1000,2000,3000];
+const MAX_IMG=5;
 
+/* ===== 便利関数 ===== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeColor=c=>/^#[0-9a-f]{6}$/i.test(c)?c:'#F2B01E';
+const fmt=iso=>new Date(iso).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ===== 保存データ ===== */
+const KEY='mitsugen-map-v1';
+let S={items:[],notices:[],seeded:false,seenUpdates:[],hidden:[],hiddenItems:[],hiddenRanges:[],toured:false,settings:{mapType:'normal',font:16,toast:true}};
+try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);S=Object.assign(S,d);S.settings=Object.assign({mapType:'normal',font:16,toast:true},d.settings)}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){flash('保存できませんでした。画像が多すぎる可能性があります');return false}}
+
+/* ===== 地図 ===== */
+const map=L.map('map',{zoomControl:false,maxZoom:21,zoomSnap:.5,maxBoundsViscosity:1});
+L.control.zoom({position:'topright'}).addTo(map);
+const bounds=L.latLngBounds(ringPts(R));
+map.setView(CENTER,13);
+map.setMaxBounds(bounds.pad(.12));
+function limitZoom(){
+  map.invalidateSize();
+  const sz=map.getSize();if(!sz.x||!sz.y)return;
+  map.setMinZoom(map.getBoundsZoom(bounds.pad(.12),false));
+}
+requestAnimationFrame(()=>{limitZoom();const sz=map.getSize();if(sz.x&&sz.y)map.fitBounds(bounds)});
+addEventListener('resize',limitZoom);
+
+const GSI='https://cyberjapandata.gsi.go.jp/xyz/';
+const tiles={
+  normal:L.tileLayer(GSI+'std/{z}/{x}/{y}.png',{maxNativeZoom:18,maxZoom:21,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'}),
+  sat:L.tileLayer(GSI+'seamlessphoto/{z}/{x}/{y}.jpg',{maxNativeZoom:18,maxZoom:21,attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'})
+};
+let tileWarned=false;
+Object.values(tiles).forEach(t=>t.on('tileerror',()=>{if(!tileWarned){tileWarned=true;flash('地図画像を読み込めません。通信を確認してください')}}));
+function setMapType(t){Object.values(tiles).forEach(l=>map.removeLayer(l));tiles[t].addTo(map);$('#map').classList.toggle('sat',t==='sat')}
+
+function ringPts(r,n=180){const dLat=r/111320,dLng=r/(111320*Math.cos(CENTER[0]*Math.PI/180));return Array.from({length:n},(_,i)=>{const a=2*Math.PI*i/n;return[CENTER[0]+dLat*Math.cos(a),CENTER[1]+dLng*Math.sin(a)]})}
+map.createPane('mask').style.zIndex=350;
+// 3km外は半透明の黒
+L.polygon([[[-85,-180],[-85,180],[85,180],[85,-180]],ringPts(R)],{pane:'mask',stroke:false,fillColor:'#000',fillOpacity:.5,interactive:false}).addTo(map);
+RINGS.forEach(r=>{
+  L.circle(CENTER,{radius:r,className:'ring',fill:false,weight:2.5,dashArray:'7 9',interactive:false}).addTo(map);
+  L.marker([CENTER[0]+r/111320,CENTER[1]],{interactive:false,keyboard:false,icon:L.divIcon({className:'ringlab',html:`<span>${r>=1000?r/1000+'km':r+'m'}</span>`,iconSize:[0,0]})}).addTo(map);
+});
+L.marker(CENTER,{interactive:false,keyboard:false,icon:L.divIcon({className:'school',html:'<span>校</span>',iconSize:[0,0]})}).addTo(map).bindTooltip('多治見西高等学校');
+
+/* ===== ピン・線の描画 ===== */
+const itemGroup=L.layerGroup().addTo(map);
+const layers=new Map();
+const pinIcon=c=>L.divIcon({className:'pin',html:`<svg viewBox="0 0 32 42" width="32" height="42"><path d="M16 1C8 1 2 7 2 15c0 10 14 26 14 26s14-16 14-26C30 7 24 1 16 1z" fill="${c}" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="15" r="5.5" fill="#fff"/></svg>`,iconSize:[32,42],iconAnchor:[16,41]});
+function drawItem(it){
+  if(layers.has(it.id)){itemGroup.removeLayer(layers.get(it.id));layers.delete(it.id)}
+  const c=safeColor(it.color);let l;
+  if(it.type==='point'){
+    l=L.marker(it.pts[0],{icon:pinIcon(c),bubblingMouseEvents:false});
+    l.bindTooltip(it.name,{direction:'top',offset:[0,-38]});
+  }else{
+    l=L.featureGroup([L.polyline(it.pts,{color:'#fff',weight:10,opacity:.9,lineCap:'round',bubblingMouseEvents:false}),L.polyline(it.pts,{color:c,weight:6,lineCap:'round',bubblingMouseEvents:false})]);
+    l.bindTooltip(it.name,{sticky:true});
+  }
+  l.on('click',()=>{if(busy||tmp.length)return;openDetail(it.id)});
+  layers.set(it.id,l);
+  if(isShown(it))l.addTo(itemGroup);
+}
+const RANGES=['〜500m','500m〜1km','1〜2km','2〜3km'];
+const repPt=it=>it.type==='point'?it.pts[0]:it.pts[Math.floor(it.pts.length/2)];
+const itemDist=it=>map.distance(CENTER,repPt(it));
+const rangeOf=it=>{const d=itemDist(it);return d<500?0:d<1000?1:d<2000?2:3};
+const isShown=it=>!S.hidden.includes(it.name)&&!S.hiddenItems.includes(it.id)&&!S.hiddenRanges.includes(rangeOf(it));
+function revealItem(it){
+  S.hidden=S.hidden.filter(n=>n!==it.name);
+  S.hiddenItems=S.hiddenItems.filter(i=>i!==it.id);
+  S.hiddenRanges=S.hiddenRanges.filter(r=>r!==rangeOf(it));
+}
+let editingId=null;
+function applyFilter(){
+  S.items.forEach(it=>{
+    const l=layers.get(it.id);if(!l||it.id===editingId)return;
+    const has=itemGroup.hasLayer(l);
+    if(isShown(it)&&!has)itemGroup.addLayer(l);
+    else if(!isShown(it)&&has)itemGroup.removeLayer(l);
+  });
+}
+function updateFilterBadge(){const n=S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length;$('#fcnt').textContent=n;$('#fcnt').hidden=!n}
+function openMapFilter(){
+  const open=new Set();
+  const w=el(`
+    <div class="filters" style="grid-template-columns:1fr"><label class="f">検索<input id="mq" type="search" placeholder="植物名で探す"></label></div>
+    <div class="acc open" id="optacc"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">絞り込み・並び替え・一括操作</span><small id="optsum"></small><span class="chev">▸</span></button></div><div class="acc-b">
+      <div class="filters">
+        <label class="f">種類<select id="mk"><option value="all">すべて</option><option value="point">点があるもの</option><option value="line">線があるもの</option></select></label>
+        <label class="f">状態<select id="ms"><option value="all">すべて</option><option value="on">表示中</option><option value="off">非表示</option></select></label>
+        <label class="f">並び替え<select id="mo"><option value="name">名前順</option><option value="count">件数が多い順</option><option value="new">新しい順</option></select></label>
+      </div>
+      <div class="btns"><button class="ghost" id="fa">一覧をすべて表示</button><button class="ghost" id="fn">一覧をすべて非表示</button></div>
+    </div></div>
+    <div id="fr"></div><div class="cnt" id="fcn"></div><div id="fl"></div>`);
+  const all=()=>{
+    const m=new Map();
+    S.items.forEach(i=>{const e=m.get(i.name)||{name:i.name,items:[],c:i.color,types:new Set(),t:''};e.items.push(i);e.types.add(i.type);if(i.created>e.t)e.t=i.created;m.set(i.name,e)});
+    return[...m.values()];
+  };
+  const shown=()=>{
+    const q=$('#mq',w).value.trim().toLowerCase(),k=$('#mk',w).value,st=$('#ms',w).value,o=$('#mo',w).value;
+    const a=all().filter(e=>(!q||e.name.toLowerCase().includes(q))&&(k==='all'||e.types.has(k))&&(st==='all'||(st==='on')===!S.hidden.includes(e.name)));
+    a.sort((x,y)=>o==='count'?(y.items.length-x.items.length)||x.name.localeCompare(y.name,'ja'):o==='new'?y.t.localeCompare(x.t):x.name.localeCompare(y.name,'ja'));
+    return a;
+  };
+  $('#optacc .acc-t',w).onclick=()=>$('#optacc',w).classList.toggle('open');
+  const toggleOpen=(key,acc)=>{open.has(key)?open.delete(key):open.add(key);acc.classList.toggle('open',open.has(key))};
+  const draw=()=>{
+    const sc=w.parentElement,top=sc?sc.scrollTop:0;
+    const sel=id=>$(id,w).selectedOptions[0].textContent,parts=[];
+    if($('#mk',w).value!=='all')parts.push(sel('#mk'));
+    if($('#ms',w).value!=='all')parts.push(sel('#ms'));
+    if($('#mo',w).value!=='name')parts.push(sel('#mo'));
+    $('#optsum',w).textContent=parts.length?parts.join(' ・ '):'条件なし';
+    const ids=S.items.map(i=>i.id),names=all().map(e=>e.name);
+    S.hidden=S.hidden.filter(h=>names.includes(h));S.hiddenItems=S.hiddenItems.filter(i=>ids.includes(i));
+    // 範囲
+    const fr=$('#fr',w);fr.innerHTML='';
+    const rc=RANGES.map(()=>0);S.items.forEach(i=>rc[rangeOf(i)]++);
+    const ra=el(`<div class="acc ${open.has('#range')?'open':''}"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">範囲ごとに切り替え(学校からの距離)</span><small>${S.hiddenRanges.length?`非表示 ${S.hiddenRanges.length}`:'すべて表示'}</small><span class="chev">▸</span></button></div><div class="acc-b"></div></div>`).firstChild;
+    $('.acc-t',ra).onclick=()=>toggleOpen('#range',ra);
+    RANGES.forEach((lab,ri)=>{
+      const r=el(`<div class="irow"><label><input type="checkbox" ${S.hiddenRanges.includes(ri)?'':'checked'}><span class="tx2">${lab}</span></label><small>${rc[ri]}件</small></div>`).firstChild;
+      $('input',r).onchange=ev=>{S.hiddenRanges=S.hiddenRanges.filter(x=>x!==ri);if(!ev.target.checked)S.hiddenRanges.push(ri);apply()};
+      $('.acc-b',ra).appendChild(r);
+    });
+    fr.appendChild(ra);
+    // 植物
+    const list=shown(),fl=$('#fl',w);fl.innerHTML='';
+    $('#fcn',w).textContent=`${list.length}種類 ・ 非表示の設定 ${S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length}`;
+    if(!list.length)fl.innerHTML=`<div class="empty">${S.items.length?'条件に合う植物がありません。':'まだ植物が登録されていません。'}</div>`;
+    list.forEach(e=>{
+      const vis=!S.hidden.includes(e.name),hiddenIn=e.items.filter(i=>S.hiddenItems.includes(i.id)).length;
+      const acc=el(`<div class="acc ${open.has(e.name)?'open':''}"><div class="acc-h"><input type="checkbox" class="nm-cb" ${vis?'checked':''} aria-label="${esc(e.name)}を表示"><button class="acc-t" type="button"><i style="background:${safeColor(e.c)}"></i><span class="nm">${esc(e.name)}</span><small>${e.items.length}件${vis&&hiddenIn?` ・ ${hiddenIn}件非表示`:''}</small><span class="chev">▸</span></button></div><div class="acc-b"></div></div>`).firstChild;
+      const cb=$('.nm-cb',acc);cb.indeterminate=vis&&hiddenIn>0;
+      cb.onchange=ev=>{
+        S.hidden=S.hidden.filter(n=>n!==e.name);
+        if(ev.target.checked){S.hiddenItems=S.hiddenItems.filter(id=>!e.items.some(i=>i.id===id))}
+        else S.hidden.push(e.name);
+        apply();
+      };
+      $('.acc-t',acc).onclick=()=>toggleOpen(e.name,acc);
+      [...e.items].sort((a,b)=>b.created.localeCompare(a.created)).forEach(i=>{
+        const byRange=S.hiddenRanges.includes(rangeOf(i));
+        const r=el(`<div class="irow ${vis&&!byRange?'':'dim'}"><label><input type="checkbox" ${S.hiddenItems.includes(i.id)?'':'checked'} ${vis?'':'disabled'}><span class="ty">${i.type==='point'?'点':(i.lineKind==='curve'?'曲線':'直線')}</span><span class="tx2">約${Math.round(itemDist(i)/10)*10}m ・ ${fmt(i.created)}${byRange?' ・ 範囲で非表示':''}</span></label><button class="ghost go" type="button">見る</button></div>`).firstChild;
+        $('input',r).onchange=ev=>{S.hiddenItems=S.hiddenItems.filter(x=>x!==i.id);if(!ev.target.checked)S.hiddenItems.push(i.id);apply()};
+        $('.go',r).onclick=()=>{closeAllPops();focusItem(i.id)};
+        $('.acc-b',acc).appendChild(r);
+      });
+      fl.appendChild(acc);
+    });
+    if(sc)sc.scrollTop=top;
+  };
+  const apply=()=>{applyFilter();save();updateFilterBadge();draw()};
+  $('#fa',w).onclick=()=>{const ns=shown().map(e=>e.name);S.hidden=S.hidden.filter(n=>!ns.includes(n));S.hiddenItems=S.hiddenItems.filter(id=>!S.items.some(i=>i.id===id&&ns.includes(i.name)));apply()};
+  $('#fn',w).onclick=()=>{const ns=shown().map(e=>e.name);S.hidden=[...new Set([...S.hidden,...ns])];apply()};
+  ['input','change'].forEach(ev=>w.addEventListener(ev,e=>{if(e.target.matches('#mq,#mk,#ms,#mo'))draw()}));
+  draw();openPop({title:'表示する植物',body:w,cls:'compact'});
+}
+$('#btn-filter').onclick=openMapFilter;
+
+/* ===== モード・ツール ===== */
+let mode='view',tool='point',lineKind='straight',tmp=[],busy=false;
+const tmpLayer=L.layerGroup().addTo(map);
+function setPressed(sel,attr,val){$$(sel).forEach(b=>b.setAttribute('aria-pressed',b.dataset[attr]===val))}
+function setMode(m){mode=m;resetDraw();setPressed('#mode button','m',m);$('#tools').hidden=m!=='edit';updateHint()}
+function setTool(t){tool=t;resetDraw();$('#here').hidden=t!=='point';setPressed('#tool button','tool',t);$('#kinds').hidden=t!=='line';updateHint()}
+function setKind(k){lineKind=k;resetDraw();setPressed('#kinds button','kind',k);updateHint()}
+function resetDraw(){tmp=[];tmpLayer.clearLayers();updateHint()}
+function updateHint(){
+  const h=$('#hint');if(mode!=='edit'){h.hidden=true;return}
+  let t;
+  if(tool==='point')t='地図をタップして点を登録';
+  else if(lineKind==='straight')t=['1点目をタップ','2点目をタップ'][tmp.length];
+  else t=['開始点をタップ','曲げる点をタップ','終わる点をタップ'][tmp.length];
+  $('#hint-t').textContent=t||'内容を入力してください';
+  $('#hint-x').hidden=!tmp.length||busy;h.hidden=false;
+}
+$('#mode').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.m)};
+$('#tool').onclick=e=>{const b=e.target.closest('button');if(b)setTool(b.dataset.tool)};
+$('#kinds').onclick=e=>{const b=e.target.closest('button');if(b)setKind(b.dataset.kind)};
+$('#hint-x').onclick=resetDraw;
+
+// 曲線: 指定した点をすべて通るなめらかな曲線(Catmull-Rom)
+const PER=20;
+function curve(raw){
+  const out=[],n=raw.length;
+  for(let i=0;i<n-1;i++){
+    const p0=raw[i-1]||raw[i],p1=raw[i],p2=raw[i+1],p3=raw[i+2]||raw[i+1];
+    for(let k=0;k<PER;k++){
+      const t=k/PER,t2=t*t,t3=t2*t;
+      out.push([0,1].map(d=>0.5*((2*p1[d])+(-p0[d]+p2[d])*t+(2*p0[d]-5*p1[d]+4*p2[d]-p3[d])*t2+(-p0[d]+3*p1[d]-3*p2[d]+p3[d])*t3)));
+    }
+  }
+  out.push(raw[n-1].slice());
+  return out;
+}
+function drawTmp(){
+  tmpLayer.clearLayers();
+  if(tool==='point')return;
+  tmp.forEach((p,i)=>{
+    const m=L.circleMarker(p,{radius:8,color:'#fff',weight:3,fillColor:'#2F5D3A',fillOpacity:1,interactive:false}).addTo(tmpLayer);
+  });
+  if(tool==='line'&&tmp.length>=2){
+    const dash=lineKind==='curve'&&tmp.length<3;
+    L.polyline(lineKind==='curve'&&tmp.length===3?curve(tmp):tmp,{color:'#F2B01E',weight:5,dashArray:dash?'4 8':null,interactive:false}).addTo(tmpLayer);
+  }
+}
+map.on('click',e=>{
+  if(mode!=='edit'||busy)return;
+  if(map.distance(CENTER,e.latlng)>R){flash('3km圏外には登録できません');return}
+  const ll=[e.latlng.lat,e.latlng.lng];
+  if(tool==='point'){tmp=[ll];drawTmp();openNew({type:'point',pts:[ll]});return}
+  const need=lineKind==='curve'?3:2;
+  tmp.push(ll);drawTmp();
+  if(tmp.length===need)openNew({type:'line',lineKind,pts:need===3?curve(tmp):tmp.slice(),raw:tmp.slice()});
+  updateHint();
+});
+
+/* ===== 位置情報 ===== */
+let watchId=null,locMk=null,locCirc=null,lastLoc=null;
+const locLayer=L.layerGroup().addTo(map);
+const locErr=err=>{stopLocate();flash(err&&err.code===1?'位置情報の利用が許可されていません。ブラウザの設定で許可してください':'現在地を取得できませんでした')};
+function setLoc(la,lo,ac){
+  lastLoc=[la,lo];
+  if(!locMk){
+    locCirc=L.circle([la,lo],{radius:ac,color:'#2a7de1',weight:1,fillColor:'#2a7de1',fillOpacity:.14,interactive:false}).addTo(locLayer);
+    locMk=L.circleMarker([la,lo],{radius:9,color:'#fff',weight:3,fillColor:'#2a7de1',fillOpacity:1,interactive:false}).addTo(locLayer);
+  }else{locMk.setLatLng([la,lo]);locCirc.setLatLng([la,lo]);locCirc.setRadius(ac)}
+}
+function startLocate(){
+  if(!navigator.geolocation){flash('この端末では位置情報が使えません');return}
+  let first=true;
+  $('#btn-loc').setAttribute('aria-pressed','true');
+  watchId=navigator.geolocation.watchPosition(p=>{
+    const la=p.coords.latitude,lo=p.coords.longitude;
+    setLoc(la,lo,p.coords.accuracy);
+    if(first){first=false;if(map.distance(CENTER,[la,lo])<=R)map.flyTo([la,lo],Math.max(map.getZoom(),16),{duration:.6});else flash('現在地は3km圏外です')}
+  },locErr,{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
+}
+function stopLocate(){
+  if(watchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(watchId);
+  watchId=null;locLayer.clearLayers();locMk=locCirc=null;lastLoc=null;
+  $('#btn-loc').setAttribute('aria-pressed','false');
+}
+const setLocate=on=>on?startLocate():stopLocate();
+$('#btn-loc').onclick=()=>{
+  if(watchId===null){startLocate();return}
+  if(lastLoc&&map.distance(CENTER,lastLoc)<=R)map.flyTo(lastLoc,Math.max(map.getZoom(),16),{duration:.5});
+  else flash('現在地は3km圏外です');
+};
+$('#b-here').onclick=()=>{
+  if(mode!=='edit'||busy)return;
+  const go=(la,lo)=>{
+    if(map.distance(CENTER,[la,lo])>R){flash('現在地が3km圏外のため登録できません');return}
+    tmp=[[la,lo]];map.flyTo([la,lo],Math.max(map.getZoom(),17),{duration:.5});
+    openNew({type:'point',pts:[[la,lo]]});
+  };
+  if(lastLoc){go(lastLoc[0],lastLoc[1]);return}
+  if(!navigator.geolocation){flash('この端末では位置情報が使えません');return}
+  navigator.geolocation.getCurrentPosition(p=>go(p.coords.latitude,p.coords.longitude),locErr,{enableHighAccuracy:true,timeout:20000});
+};
+
+/* ===== ポップオーバー ===== */
+function openPop({title,body,cls='',onClose,side=false}){
+  const ov=document.createElement('div');ov.className='ov'+(side?' side':'');
+  ov.innerHTML=`<div class="pop ${cls}" role="dialog" aria-modal="true"><div class="pop-h"><h2></h2><button class="x" aria-label="閉じる">×</button></div><div class="pop-b"></div></div>`;
+  $('h2',ov).textContent=title;
+  const pb=$('.pop-b',ov);pb.appendChild(body);
+  const close=()=>{if(!ov.isConnected)return;ov.remove();onClose&&onClose();if(!$('.ov'))setNav('map')};
+  ov._close=close;
+  $('.x',ov).onclick=close;
+  ov.addEventListener('pointerdown',e=>{if(e.target===ov)close()});
+  document.body.appendChild(ov);
+  return{close,body:pb,el:ov};
+}
+const closeAllPops=()=>$$('.ov').reverse().forEach(o=>o._close());
+addEventListener('keydown',e=>{if(e.key==='Escape'){const o=$$('.ov').pop();o&&o._close()}});
+const el=(html)=>{const d=document.createElement('div');d.innerHTML=html;return d};
+
+/* ===== 登録・編集画面 ===== */
+function readImg(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,800/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.7))};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+function openNew(d){
+  openEditor({id:null,type:d.type,lineKind:d.lineKind,pts:d.pts,raw:d.raw,name:'',color:'#F2B01E',images:[],note:''},true);
+}
+function openDetail(id){const it=S.items.find(i=>i.id===id);if(it)openEditor(it,false)}
+function openEditor(item,isNew){
+  busy=true;updateHint();editingId=item.id;
+  let imgs=[...item.images],locked=!isNew;
+  let pos=item.pts[0],orig=item.pts[0],saved=false,mk=null;
+  const origPts=JSON.stringify(item.pts);
+  let raw=null,editLayer=null,hiddenLayer=null,onColor=()=>{};
+  const clampLL=ll=>{const d=map.distance(CENTER,ll);if(d<=R)return ll;const k=(R-1)/d;return L.latLng(CENTER[0]+(ll.lat-CENTER[0])*k,CENTER[1]+(ll.lng-CENTER[1])*k)};
+  const onDragEnd=()=>{if(locked){locked=false;lock()}};
+  const onDrag=()=>{const a=mk.getLatLng(),c=clampLL(a);if(c!==a)mk.setLatLng(c);pos=[c.lat,c.lng]};
+  if(item.type==='point'&&mode==='edit'){
+    mk=isNew?L.marker(pos,{icon:pinIcon(safeColor(item.color)),zIndexOffset:1000}).addTo(tmpLayer):layers.get(item.id);
+    if(mk){mk.on('drag',onDrag);mk.on('dragend',onDragEnd)}
+  }
+  const w=el(`
+    <label class="f">植物名<input id="f-name" type="text" maxlength="40" placeholder="例:ナナカマド" autocomplete="off"></label>
+    <div id="f-err" class="err" hidden></div>
+    <div id="f-drag" class="err" style="color:var(--leaf);margin:-.4rem 0 .9rem" hidden>📍 地図のピンをドラッグすると位置を変えられます(3km圏内)</div>
+    <label class="f">ピンの色<input id="f-color" type="color"></label>
+    <div class="f">画像を追加(${MAX_IMG}枚まで) <span id="f-cnt" style="font-weight:400"></span>
+      <input id="f-file" type="file" accept="image/*" multiple style="display:block;margin-top:.4rem;font-weight:400">
+      <div id="f-th" class="thumbs"></div></div>
+    <label class="f">その他<textarea id="f-note" rows="3" maxlength="500" placeholder="開花時期、気づいたことなど"></textarea></label>
+    <div class="btns" id="f-cbtn" hidden style="margin:0 0 .9rem;flex-wrap:wrap"><button id="b-add" type="button" class="ghost">＋ 曲がる点を追加</button><button id="b-rm" type="button" class="ghost danger">選んだ点を削除</button></div>
+    <div class="btns"><button id="b-del" class="ghost danger">削除</button><span class="sp"></span><button id="b-edit" class="ghost">編集</button><button id="b-ok" class="primary">決定</button></div>`);
+  const $f=s=>$(s,w);
+  $f('#f-name').value=item.name;$f('#f-color').value=safeColor(item.color);$f('#f-note').value=item.note;
+  $f('#f-color').oninput=()=>{onColor();if(mk)mk.setIcon(pinIcon(safeColor($f('#f-color').value)))};
+  if(item.type==='line'&&mode==='edit'){
+    const isCurve=item.lineKind==='curve',MAXP=12;
+    raw=item.raw?item.raw.map(p=>p.slice()):(isCurve?[item.pts[0],item.pts[Math.floor(item.pts.length/2)],item.pts[item.pts.length-1]]:[item.pts[0],item.pts[item.pts.length-1]]);
+    let sel=-1,handles=[],moveMk=null;
+    const linePts=()=>isCurve?curve(raw):raw.map(p=>p.slice());
+    const centerOf=()=>isCurve?curve(raw)[Math.floor(PER/2)]:[(raw[0][0]+raw[1][0])/2,(raw[0][1]+raw[1][1])/2];
+    const allInside=r=>r.every(p=>map.distance(CENTER,p)<=R);
+    const col=()=>safeColor($f('#f-color').value);
+    tmpLayer.clearLayers();
+    editLayer=L.layerGroup().addTo(map);
+    const old=layers.get(item.id);
+    if(!isNew&&old){itemGroup.removeLayer(old);hiddenLayer=old}
+    const casing=L.polyline(linePts(),{color:'#fff',weight:14,opacity:.9,lineCap:'round',bubblingMouseEvents:false}).addTo(editLayer);
+    const line=L.polyline(linePts(),{color:col(),weight:6,lineCap:'round',interactive:false}).addTo(editLayer);
+    const guide=isCurve?L.polyline(raw,{color:'#fff',weight:2,dashArray:'4 6',interactive:false}).addTo(editLayer):null;
+    const hLayer=L.layerGroup().addTo(editLayer);
+    const refreshLine=()=>{const p=linePts();casing.setLatLngs(p);line.setLatLngs(p);if(guide)guide.setLatLngs(raw)};
+    const hIcon=(c,html='<span></span>')=>L.divIcon({className:'handle '+c,html,iconSize:[30,30],iconAnchor:[15,15]});
+    const ARROWS='<span><svg viewBox="0 0 24 24" fill="none" stroke="#2F5D3A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg></span>';
+    const updateBtns=()=>{if(!isCurve)return;$f('#b-rm').disabled=!(sel>0&&sel<raw.length-1);$f('#b-add').disabled=raw.length>=MAXP};
+    function rebuild(){
+      hLayer.clearLayers();refreshLine();
+      handles=raw.map((p,i)=>{
+        const cls=i===0?'st':i===raw.length-1?'en':'bd';
+        const h=L.marker(p,{draggable:true,icon:hIcon(cls+(i===sel?' sel':'')),zIndexOffset:2000}).addTo(hLayer);
+        h.on('drag',()=>{const a=h.getLatLng(),c=clampLL(a);if(c!==a)h.setLatLng(c);raw[i]=[c.lat,c.lng];refreshLine();moveMk.setLatLng(centerOf())});
+        h.on('dragend',onDragEnd);
+        if(cls==='bd')h.on('click',()=>{sel=sel===i?-1:i;rebuild()});
+        return h;
+      });
+      moveMk=L.marker(centerOf(),{draggable:true,icon:hIcon('mv',ARROWS),zIndexOffset:2100}).addTo(hLayer);
+      let startRaw,startLL,lastD;
+      moveMk.on('dragstart',()=>{startRaw=raw.map(p=>p.slice());startLL=moveMk.getLatLng();lastD=[0,0]});
+      moveMk.on('drag',()=>{
+        const ll=moveMk.getLatLng(),d=[ll.lat-startLL.lat,ll.lng-startLL.lng];
+        const nr=startRaw.map(p=>[p[0]+d[0],p[1]+d[1]]);
+        if(allInside(nr)){lastD=d;raw=nr}
+        else{raw=startRaw.map(p=>[p[0]+lastD[0],p[1]+lastD[1]]);moveMk.setLatLng([startLL.lat+lastD[0],startLL.lng+lastD[1]])}
+        handles.forEach((h,i)=>h.setLatLng(raw[i]));refreshLine();
+      });
+      moveMk.on('dragend',onDragEnd);
+      updateBtns();
+    }
+    if(isCurve){
+      $f('#f-cbtn').hidden=false;
+      const tooMany=()=>{flash(`曲がる点は${MAXP-2}個までです`)};
+      casing.on('click',e=>{
+        if(raw.length>=MAXP){tooMany();return}
+        const pts=curve(raw);let bi=0,bd=Infinity;
+        pts.forEach((p,i)=>{const d=map.distance(e.latlng,p);if(d<bd){bd=d;bi=i}});
+        const k=Math.min(raw.length-2,Math.floor(bi/PER)),c=clampLL(e.latlng);
+        raw.splice(k+1,0,[c.lat,c.lng]);sel=k+1;rebuild();onDragEnd();
+      });
+      $f('#b-add').onclick=()=>{
+        if(raw.length>=MAXP){tooMany();return}
+        let k=0,best=-1;
+        for(let i=0;i<raw.length-1;i++){const d=map.distance(raw[i],raw[i+1]);if(d>best){best=d;k=i}}
+        const m=curve(raw)[k*PER+Math.floor(PER/2)];
+        raw.splice(k+1,0,[m[0],m[1]]);sel=k+1;rebuild();onDragEnd();
+      };
+      $f('#b-rm').onclick=()=>{if(sel>0&&sel<raw.length-1){raw.splice(sel,1);sel=-1;rebuild();onDragEnd()}};
+    }
+    onColor=()=>line.setStyle({color:col()});
+    $f('#f-drag').textContent='📍 '+(isCurve?'丸をドラッグして形を変えられます(緑=始点、赤=終点、黄=曲がる点)。線をタップするか下のボタンで曲がる点を増やせます。黄色の点をタップして選ぶと削除できます。':'緑と赤の丸をドラッグして端を動かせます。')+'矢印の丸をドラッグすると全体が動きます(3km圏内)';
+    w._linePts=linePts;
+    rebuild();
+  }
+  const kind=item.type==='point'?'点':(item.lineKind==='curve'?'曲線':'直線');
+  function thumbs(){
+    $f('#f-cnt').textContent=`${imgs.length}/${MAX_IMG}`;
+    const box=$f('#f-th');box.innerHTML='';
+    imgs.forEach((src,i)=>{
+      const t=el(`<div class="th"><button type="button" aria-label="画像を拡大"><img alt=""></button>${locked?'':'<button type="button" class="rm" aria-label="画像を削除">×</button>'}</div>`).firstChild;
+      $('img',t).src=src;
+      $('button',t).onclick=()=>{const im=new Image();im.src=src;im.style.cssText='width:100%;border-radius:.8rem;display:block';openPop({title:'画像',body:im})};
+      const rm=$('.rm',t);if(rm)rm.onclick=()=>{imgs.splice(i,1);thumbs()};
+      box.appendChild(t);
+    });
+  }
+  function lock(){
+    ['#f-name','#f-color','#f-note','#f-file'].forEach(s=>$f(s).disabled=locked);
+    $f('#b-edit').disabled=!(locked&&mode==='edit');
+    $f('#b-ok').disabled=locked;
+    $f('#b-del').hidden=isNew||mode!=='edit';
+    if(mk&&mk.dragging)mk.dragging.enable();
+    $f('#f-drag').hidden=!(mk||raw);
+    thumbs();
+  }
+  lock();
+  $f('#f-file').onchange=async e=>{
+    for(const f of e.target.files){
+      if(imgs.length>=MAX_IMG){flash(`画像は${MAX_IMG}枚までです`);break}
+      try{imgs.push(await readImg(f))}catch(_){flash('画像を読み込めませんでした')}
+    }
+    e.target.value='';thumbs();
+  };
+  $f('#b-edit').onclick=()=>{locked=false;lock();$f('#f-name').focus()};
+  $f('#b-del').onclick=()=>{
+    if(!confirm(`「${item.name}」を削除しますか?`))return;
+    S.items=S.items.filter(i=>i.id!==item.id);
+    if(layers.has(item.id)){itemGroup.removeLayer(layers.get(item.id));layers.delete(item.id)}
+    save();saved=true;pop.close();addNotice('del',`「${item.name}」を削除しました`,`${kind}の登録を削除しました。`);
+  };
+  $f('#b-ok').onclick=()=>{
+    const name=$f('#f-name').value.trim();
+    if(!name){const e=$f('#f-err');e.textContent='植物名を入力してください';e.hidden=false;$f('#f-name').focus();return}
+    const now=new Date().toISOString();
+    const data={name,color:$f('#f-color').value,images:imgs,note:$f('#f-note').value.trim(),updated:now};
+    if(item.type==='point')data.pts=[pos];
+    else if(raw){data.pts=w._linePts();data.raw=raw.map(p=>p.slice())}
+    if(isNew){
+      const it=Object.assign({},item,data,{id:uid(),created:now});
+      S.items.push(it);revealItem(it);drawItem(it);applyFilter();updateFilterBadge();
+      if(!save()){S.items.pop();itemGroup.removeLayer(layers.get(it.id));layers.delete(it.id);return}
+      saved=true;pop.close();
+      const d=Math.round(map.distance(CENTER,it.pts[0])/10)*10;
+      addNotice('add',`「${name}」を追加しました`,`${kind}として登録しました。\n学校から約${d}mの位置です。`+(it.note?`\n\nメモ: ${it.note}`:''),it.id);
+    }else{
+      const it=S.items.find(i=>i.id===item.id);Object.assign(it,data);revealItem(it);drawItem(it);applyFilter();updateFilterBadge();
+      if(!save())return;
+      saved=true;pop.close();
+      const moved=JSON.stringify(data.pts)!==origPts;
+      addNotice('edit',`「${name}」を編集しました`,`${kind}の内容を更新しました。`+(moved?'\n位置や形を変更しました。':''),it.id);
+    }
+  };
+  const pop=openPop({title:isNew?`${kind}を登録`:item.name,body:w,side:true,onClose:()=>{
+    busy=false;editingId=null;
+    if(mk){mk.off('drag',onDrag);mk.off('dragend',onDragEnd);if(mk.dragging)mk.dragging.disable();if(!isNew&&!saved){mk.setLatLng(orig);mk.setIcon(pinIcon(safeColor(item.color)))}}
+    if(editLayer){map.removeLayer(editLayer);if(!saved&&hiddenLayer)itemGroup.addLayer(hiddenLayer)}
+    resetDraw();
+  }});
+}
+
+/* ===== 植物一覧 ===== */
+function openPlants(){
+  const w=el(`
+    <div class="filters">
+      <label class="f wide">検索<input id="q" type="search" placeholder="植物名・メモで探す"></label>
+      <label class="f">種類<select id="ft"><option value="all">すべて</option><option value="point">点</option><option value="line">線</option></select></label>
+      <label class="f">並び替え<select id="so"><option value="new">新しい順</option><option value="old">古い順</option><option value="name">名前順</option></select></label>
+      <label class="chk wide"><input type="checkbox" id="fi">画像あり</label>
+    </div>
+    <div class="cnt" id="cnt"></div><div id="ls"></div>`);
+  const draw=()=>{
+    const q=$('#q',w).value.trim().toLowerCase(),ft=$('#ft',w).value,so=$('#so',w).value,fi=$('#fi',w).checked;
+    let a=S.items.filter(i=>(ft==='all'||i.type===ft)&&(!fi||i.images.length)&&(!q||(i.name+' '+i.note).toLowerCase().includes(q)));
+    a.sort((x,y)=>so==='name'?x.name.localeCompare(y.name,'ja'):so==='old'?x.created.localeCompare(y.created):y.created.localeCompare(x.created));
+    $('#cnt',w).textContent=`${a.length}件`;
+    const ls=$('#ls',w);ls.innerHTML='';
+    if(!a.length){ls.innerHTML=`<div class="empty">${S.items.length?'条件に合う植物がありません。':'まだ植物が登録されていません。<br>編集に切り替えて、地図をタップして追加しましょう。'}</div>`;return}
+    a.forEach(i=>{
+      const kind=i.type==='point'?'点':(i.lineKind==='curve'?'曲線':'直線');
+      const b=el(`<button class="card"><div class="im">${i.images[0]?'<img alt="">':`<i style="background:${safeColor(i.color)}"></i>`}</div><div class="tx"><b>${esc(i.name)}</b><small>${kind} ・ ${fmt(i.created)}${i.images.length?` ・ 画像${i.images.length}`:''}</small></div></button>`).firstChild;
+      if(i.images[0])$('img',b).src=i.images[0];
+      b.onclick=()=>{closeAllPops();focusItem(i.id)};
+      ls.appendChild(b);
+    });
+  };
+  ['input','change'].forEach(ev=>w.addEventListener(ev,draw));
+  draw();openPop({title:'植物一覧',body:w,cls:'compact'});
+}
+function focusItem(id){
+  const it=S.items.find(i=>i.id===id),l=layers.get(id);if(!it||!l)return;
+  if(!isShown(it)){revealItem(it);applyFilter();save();updateFilterBadge()}
+  if(it.type==='point')map.flyTo(it.pts[0],Math.max(map.getZoom(),16),{duration:.6});
+  else map.flyToBounds(l.getBounds().pad(.4),{maxZoom:17,duration:.6});
+  setTimeout(()=>openDetail(id),700);
+}
+
+/* ===== お知らせ ===== */
+const KINDS={add:'追加',edit:'編集',del:'削除',upd:'アップデート'};
+function addNotice(kind,title,body,itemId,silent){
+  const n={id:uid(),kind,title,body,itemId:itemId||null,time:new Date().toISOString(),read:false};
+  S.notices.unshift(n);S.notices=S.notices.slice(0,100);save();updateBadge();
+  if(!silent)toast(n);
+}
+function updateBadge(){const u=S.notices.filter(n=>!n.read).length;$('#badge').textContent=u;$('#badge').hidden=!u}
+function showToast(t,life){
+  const box=$('#toasts');
+  while(box.children.length>=5)box.firstChild.remove();
+  box.appendChild(t);
+  setTimeout(()=>t.classList.add('fade'),life-1600);
+  setTimeout(()=>t.remove(),life);
+}
+function toast(n){
+  if(!S.settings.toast)return;
+  const t=el(`<div class="toast" role="status"><b>${esc(n.title)}</b><span>${esc(KINDS[n.kind])}のお知らせ</span></div>`).firstChild;
+  t.onclick=()=>{t.remove();openNotice(n)};
+  showToast(t,5000);
+}
+function flash(msg){
+  const t=el(`<div class="toast warn" role="alert"></div>`).firstChild;t.textContent=msg;
+  showToast(t,3200);
+}
+function openNotices(){
+  const w=el(`
+    <div class="filters">
+      <label class="f">種類<select id="nk"><option value="all">すべて</option>${Object.entries(KINDS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+      <label class="f">並び替え<select id="ns"><option value="new">新しい順</option><option value="old">古い順</option><option value="unread">未読を先に</option></select></label>
+      <label class="chk wide"><input type="checkbox" id="nu">未読だけ</label>
+    </div>
+    <div class="cnt" id="ncnt"></div><div id="nl"></div>`);
+  const draw=()=>{
+    const k=$('#nk',w).value,so=$('#ns',w).value,u=$('#nu',w).checked;
+    const a=S.notices.filter(n=>(k==='all'||n.kind===k)&&(!u||!n.read));
+    a.sort((x,y)=>so==='old'?x.time.localeCompare(y.time):so==='unread'?((x.read-y.read)||y.time.localeCompare(x.time)):y.time.localeCompare(x.time));
+    $('#ncnt',w).textContent=`${a.length}件`;
+    const nl=$('#nl',w);nl.innerHTML='';
+    if(!a.length){nl.innerHTML=`<div class="empty">${S.notices.length?'条件に合うお知らせがありません。':'お知らせはまだありません。'}</div>`;return}
+    a.forEach(n=>{
+      const b=el(`<button class="card nt">${n.read?'':'<span class="dot"></span>'}<div class="tx"><b>${esc(n.title)}</b><small><span class="chip ${n.kind}">${KINDS[n.kind]}</span>${fmt(n.time)}</small><small class="pv">${esc(n.body)}</small></div></button>`).firstChild;
+      b.onclick=()=>openNotice(n,draw);
+      nl.appendChild(b);
+    });
+  };
+  ['input','change'].forEach(ev=>w.addEventListener(ev,draw));
+  draw();openPop({title:'お知らせ',body:w});
+}
+function openNotice(n,after){
+  n.read=true;save();updateBadge();
+  const w=el(`<span class="chip ${n.kind}">${KINDS[n.kind]}</span><small style="color:var(--mut)">${fmt(n.time)}</small><div class="nbody">${esc(n.body)}</div>`);
+  if(n.itemId&&S.items.some(i=>i.id===n.itemId)){
+    const b=el('<button class="primary">地図で見る</button>').firstChild;
+    b.onclick=()=>{closeAllPops();focusItem(n.itemId)};w.appendChild(b);
+  }
+  openPop({title:n.title,body:w,cls:'big',onClose:()=>after&&after()});
+}
+
+/* ===== 設定 ===== */
+function applyFont(){document.documentElement.style.fontSize=S.settings.font+'px'}
+function openSettings(){
+  const s=S.settings;
+  const w=el(`
+    <div class="set"><h3>マップの種類</h3><div class="seg full" id="mt"><button data-t="normal" aria-pressed="${s.mapType==='normal'}">普通</button><button data-t="sat" aria-pressed="${s.mapType==='sat'}">衛星</button></div></div>
+    <div class="set"><h3>文字のサイズ <span id="fv" style="font-weight:400">${s.font}px</span></h3><input type="range" id="fs" min="12" max="24" step="1" value="${s.font}"><p style="margin:.3rem 0 0">この大きさで文字が表示されます。</p></div>
+    <div class="set"><div class="row"><h3 style="margin:0">お知らせのトースト表示</h3><label class="sw"><input type="checkbox" id="ts" ${s.toast?'checked':''}><i></i></label></div></div>
+    <div class="set"><div class="row"><h3 style="margin:0">現在地を表示</h3><label class="sw"><input type="checkbox" id="lc" ${watchId!==null?'checked':''}><i></i></label></div></div>`);
+  $('#mt',w).onclick=e=>{const b=e.target.closest('button');if(!b)return;s.mapType=b.dataset.t;setMapType(s.mapType);$$('#mt button',w).forEach(x=>x.setAttribute('aria-pressed',x===b));save()};
+  $('#fs',w).oninput=e=>{s.font=+e.target.value;$('#fv',w).textContent=s.font+'px';applyFont()};
+  $('#fs',w).onchange=save;
+  $('#ts',w).onchange=e=>{s.toast=e.target.checked;save()};
+  $('#lc',w).onchange=e=>setLocate(e.target.checked);
+  openPop({title:'設定',body:w});
+}
+
+/* ===== ドロワー・ナビ ===== */
+const drawer=$('#drawer'),scrim=$('#scrim');
+function openDrawer(){drawer.classList.add('open');scrim.classList.add('open');drawer.setAttribute('aria-hidden','false')}
+function closeDrawer(){drawer.classList.remove('open');scrim.classList.remove('open');drawer.setAttribute('aria-hidden','true')}
+$('#btn-menu').onclick=openDrawer;scrim.onclick=closeDrawer;
+function setNav(){}
+function go(n){
+  closeDrawer();closeAllPops();
+  if(n==='plants')openPlants();
+  else if(n==='settings')openSettings();
+  else if(n==='notices')openNotices();
+  else if(n==='help')setTimeout(startTour,260);
+}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+$('#btn-bell').onclick=()=>go('notices');
+
+/* ===== コーチマーク(使い方) ===== */
+const circleRect=()=>{
+  const m=$('#map').getBoundingClientRect(),sw=map.latLngToContainerPoint(bounds.getSouthWest()),ne=map.latLngToContainerPoint(bounds.getNorthEast());
+  const l=Math.max(m.left,m.left+sw.x),t=Math.max(m.top,m.top+ne.y),r=Math.min(m.right,m.left+ne.x),b=Math.min(m.bottom,m.top+sw.y);
+  return{left:l,top:t,width:r-l,height:b-t};
+};
+const STEPS=[
+  {sel:'#btn-menu',mode:'view',t:'ここからメニューを開きます。植物一覧・設定・お知らせ・使い方に移動できます。'},
+  {rect:circleRect,mode:'view',t:'ホームは地図です。多治見西高校を中心に、500m・1km・2km・3kmを点線の円で表しています。3kmより外は暗くなり、登録できません。'},
+  {sel:'#fwrap',mode:'view',t:'左上の「フィルター」で、地図に表示する植物を名前ごとに選べます。'},
+  {sel:'#btn-loc',mode:'view',t:'現在地ボタンで、いまいる場所を地図に表示します(位置情報の許可が必要です)。もう一度押すと現在地に戻ります。'},
+  {sel:'#mode',mode:'view',t:'右下で「閲覧」と「編集」を切り替えます。植物を登録できるのは「編集」のときだけです。'},
+  {sel:'#tools',mode:'edit',t:'編集では「点」か「線」を選びます。線は直線か曲線を選べます。地図をタップして場所を決め、出てきた画面に植物の情報を入れて「決定」を押します。曲線は「開始点→曲げる点→終わる点」の順にタップします。'},
+  {sel:'#btn-bell',mode:'view',t:'植物の追加や編集、アップデートのお知らせがここに届きます。数字は未読の数です。'}
+];
+function startTour(){
+  closeAllPops();closeDrawer();
+  let i=0;const co=$('#coach'),spot=$('#spot'),bub=$('#bubble');co.hidden=false;
+  function place(){
+    const s=STEPS[i];let r;
+    if(s.rect)r=s.rect();else{const b=$(s.sel).getBoundingClientRect();r={left:b.left,top:b.top,width:b.width,height:b.height}}
+    const p=6;
+    Object.assign(spot.style,{left:r.left-p+'px',top:r.top-p+'px',width:r.width+p*2+'px',height:r.height+p*2+'px'});
+    bub.innerHTML=`<p>${esc(s.t)}</p><div class="btns"><small>${i+1} / ${STEPS.length}</small><span class="sp"></span><button class="ghost" id="c-skip">${i<STEPS.length-1?'スキップ':'閉じる'}</button>${i<STEPS.length-1?'<button class="primary" id="c-next">次へ</button>':'<button class="primary" id="c-skip2">完了</button>'}</div>`;
+    const bh=bub.offsetHeight,bw=bub.offsetWidth,vh=innerHeight,vw=innerWidth;
+    let top=r.top+r.height+p+14;if(top+bh>vh-8)top=r.top-p-14-bh;
+    if(top<8)top=Math.max(8,Math.min(vh-bh-8,(vh-bh)/2));
+    const left=Math.max(8,Math.min(vw-bw-8,r.left+r.width/2-bw/2));
+    bub.style.top=top+'px';bub.style.left=left+'px';
+    $('#c-skip').onclick=end;$('#c-skip2')&&($('#c-skip2').onclick=end);$('#c-next')&&($('#c-next').onclick=()=>{i++;show()});
+  }
+  function show(){setMode(STEPS[i].mode);requestAnimationFrame(()=>requestAnimationFrame(place))}
+  function end(){co.hidden=true;setMode('view');S.toured=true;save()}
+  show();
+}
+
+/* ===== 起動 ===== */
+applyFont();setMapType(S.settings.mapType);
+S.items.forEach(drawItem);
+const firstRun=!S.seeded;
+if(!S.seeded){S.seeded=true;addNotice('upd','みつばち蜜源マップへようこそ','多治見西高校から3km圏内の蜜源植物を、点と線で登録できます。\n\n「編集」に切り替えて地図をタップすると登録できます。使い方はメニューの「使い方」から見られます。',null,true)}
+const UPDATES=[
+  {id:'v1.1',title:'アップデート v1.1',body:'・ピンを削除できるようになりました(編集モードでピンをタップ)\n・ピンの編集画面を右側に表示するようにしました\n・編集モードでピンをドラッグして位置を変えられるようになりました\n・お知らせに並び替えと絞り込みを追加しました\n・お知らせのトーストを右上に表示し、だんだん消えるようにしました'},
+  {id:'v1.2',title:'アップデート v1.2',body:'・直線・曲線も、編集モードでドラッグして形や位置を変えられるようになりました\n・「始・曲・終」の丸で端や曲げる点を動かし、緑の ✥ で全体を動かせます'},
+  {id:'v1.3',title:'アップデート v1.3',body:'・曲線の曲がる点を増やせるようになりました(線をタップ、または「曲がる点を追加」)\n・黄色の点を選んで削除もできます\n・編集中の点から文字を外し、色(緑=始点、赤=終点、黄=曲がる点)で見分けるようにしました'},
+  {id:'v1.4',title:'アップデート v1.4',body:'・地図の左上に「フィルター」を追加しました。植物の名前ごとに、表示するピンや線を選べます\n・現在地ボタンを追加しました。押すと現在地が地図に出ます(位置情報の許可が必要です)\n・編集モードの「点」で「現在地に登録」を押すと、いまいる場所にピンを追加できます\n・設定に「現在地を表示」のオン/オフを追加しました'},
+  {id:'v1.5',title:'アップデート v1.5',body:'・「表示する植物」に検索・種類・状態の絞り込みと、並び替え(名前順・件数順・新しい順)を追加しました\n・「一覧をすべて表示/非表示」は、絞り込んだ植物だけに働きます\n・トーストは同時に5つまで表示するようにしました'},
+  {id:'v1.6',title:'アップデート v1.6',body:'・「植物一覧」と「表示する植物」の画面をコンパクトにしました\n・検索・絞り込み・並び替えを1〜2行にまとめ、一度に見られる植物が増えました'},
+  {id:'v1.7',title:'アップデート v1.7',body:'・「植物一覧」と「表示する植物」の画面を大きくしました\n・「表示する植物」の並び替えを、種類・状態と同じ行に移しました\n・地図をさらに拡大できるようになりました(拡大しすぎると画質は粗くなります)'},
+  {id:'v1.8',title:'アップデート v1.8',body:'・「植物一覧」と「表示する植物」の画面を縦にも大きくしました'},
+  {id:'v1.9',title:'アップデート v1.9',body:'・「表示する植物」をアコーディオンにしました。植物名をタップすると、その植物の点・線が一件ずつ開きます\n・一件ごとに表示/非表示を切り替えられます。「見る」で地図の場所へ移動します\n・「範囲ごとに切り替え」で、学校から500m・1km・2km・3kmの区間ごとに表示/非表示を切り替えられます\n・新しく登録したり編集したピンは、自動で表示に戻ります'},
+  {id:'v1.10',title:'アップデート v1.10',body:'・「表示する植物」の「絞り込み・並び替え・一括操作」(種類・状態・並び替え・一覧をすべて表示/非表示)を折りたためるようにしました\n・折りたたんだままでも、いま選んでいる条件が横に表示されます'}
+];
+if(firstRun)UPDATES.forEach(u=>S.seenUpdates.push(u.id));
+else UPDATES.forEach(u=>{if(!S.seenUpdates.includes(u.id)){S.seenUpdates.push(u.id);addNotice('upd',u.title,u.body)}});
+save();
+updateBadge();updateFilterBadge();setMode('view');
+if(!S.toured)setTimeout(startTour,700);
+}catch(err){
+  var d=document.createElement('pre');d.style.cssText='position:fixed;left:8px;right:8px;top:4rem;z-index:9999;background:#fff;color:#B3372B;border:3px solid #B3372B;padding:10px;border-radius:10px;font-size:12px;white-space:pre-wrap;max-height:60vh;overflow:auto';
+  d.textContent='【エラー内容】\n'+(err&&err.stack?err.stack:err);document.body.appendChild(d);
+}
+</script>
 </body>
 </html>
