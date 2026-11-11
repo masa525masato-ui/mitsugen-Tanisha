@@ -74,7 +74,8 @@ nav button.on .ic{background:var(--mint);border-radius:1rem;padding:0 .9rem}
 #drawer .dh{background:var(--leaf);color:#fff;padding:calc(1.2rem + env(safe-area-inset-top)) 1.2rem 1.2rem}
 #drawer .dh b{display:block;font-size:1.2rem;margin-top:.5rem}
 #drawer .dh small{opacity:.85}
-#drawer ul{list-style:none;margin:.5rem 0;padding:0 .6rem}
+#drawer ul{list-style:none;margin:.5rem 0;padding:0 .6rem;overflow-y:auto}
+#drawer li.sep{border-top:1px solid var(--line);margin:.4rem .8rem}
 #drawer li button{width:100%;border:0;background:transparent;text-align:left;display:flex;align-items:center;gap:.9rem;padding:.9rem .8rem;border-radius:.9rem;font-size:1.05rem}
 #drawer li button:active{background:var(--mint)}
 /* popover */
@@ -132,6 +133,15 @@ button:disabled{opacity:.4;cursor:default}
 .compact .frow input{width:1.2rem;height:1.2rem}
 .compact .frow i{width:.95rem;height:.95rem}
 .compact .empty{padding:1.2rem .5rem}
+.toprow{display:flex;align-items:flex-end;gap:.6rem;margin-bottom:.5rem}
+.toprow .f{flex:1;min-width:0;margin:0;font-size:.72rem}
+.toprow .f input[type=search]{margin-top:.15rem;padding:.4rem .5rem;font-size:.88rem;border-radius:.6rem}
+.toprow #tabs{flex:none;margin:0}
+.compact #tabs{display:inline-flex;width:auto;padding:.15rem;border-radius:.8rem}
+.compact #tabs button{padding:.25rem .8rem;min-height:2rem;font-size:.8rem;border-radius:.6rem;white-space:nowrap;flex:none;word-break:keep-all}
+.compact #tabs button span{white-space:nowrap}
+.card .go,.compact .btns .ghost{white-space:nowrap;word-break:keep-all}
+.card .tx small{word-break:keep-all}
 /* アコーディオン */
 .acc{border:1.5px solid var(--line);border-radius:.8rem;margin-bottom:.4rem;background:#fff;overflow:hidden}
 .acc-h{display:flex;align-items:center;gap:.6rem;padding:.2rem .6rem}
@@ -141,9 +151,9 @@ button:disabled{opacity:.4;cursor:default}
 .acc-t .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .acc-t small{color:var(--mut);font-weight:400;font-size:.76rem;white-space:nowrap}
 .chev{color:var(--mut);transition:transform .15s}
-.acc.open .chev{transform:rotate(90deg)}
+.acc.open>.acc-h .chev{transform:rotate(90deg)}
 .acc-b{display:none;border-top:1px solid var(--line);background:#FBFCF5;padding:.15rem .7rem .4rem}
-.acc.open .acc-b{display:block}
+.acc.open>.acc-b{display:block}
 .irow{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px dashed var(--line)}
 .irow:last-child{border:0}
 .irow label{flex:1;min-width:0;display:flex;align-items:center;gap:.6rem;font-size:.86rem}
@@ -152,6 +162,15 @@ button:disabled{opacity:.4;cursor:default}
 .irow small{color:var(--mut)}
 .irow.dim{opacity:.55}
 .irow .go{padding:.15rem .7rem;min-height:2rem;font-size:.8rem;border-width:1.5px}
+.bl{display:flex;gap:.5rem;align-items:center;margin-top:.35rem}
+.bl select{margin-top:0!important}
+.mini{padding:.3rem .4rem;border:1.5px solid var(--line);border-radius:.6rem;background:#fff;font-size:.88rem}
+.card .go{padding:.25rem .7rem;min-height:2.2rem;font-size:.82rem;flex:none;border-width:1.5px}
+.cl{position:relative}
+.cl .cnt{position:absolute;top:-8px;right:-10px;min-width:22px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:11px;background:var(--leaf-d);color:#fff;border:2px solid #fff;font:700 12px/18px sans-serif;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.avatar{width:3.2rem;height:3.2rem;border-radius:50%;background:var(--mint);display:grid;place-items:center;flex:none}
+.soon-note{background:#FFF4D1;border:1.5px solid #F2D48A;border-radius:.8rem;padding:.7rem .8rem;line-height:1.7;font-size:.9rem}
+.set .btns .ghost,.set .btns .primary,.soon-note+.btns .ghost,.soon-note+.btns .primary{white-space:nowrap}
 /* lists */
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem}
 .filters .f{margin:0}
@@ -210,6 +229,7 @@ input[type=range]{width:100%;accent-color:var(--leaf);height:2rem}
   <button class="ib" id="btn-menu" aria-label="メニューを開く"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <h1><svg width="26" height="26" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/><polygon points="12,7 16.5,9.5 16.5,14.5 12,17 7.5,14.5 7.5,9.5" fill="#2F5D3A"/></svg>みつばち蜜源マップ</h1>
   <button class="ib" id="btn-bell" aria-label="お知らせ"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 1 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/></svg><span id="badge" hidden>0</span></button>
+  <button class="ib" id="btn-account" aria-label="アカウント"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
 </header>
 
 <div id="mapwrap">
@@ -241,12 +261,16 @@ input[type=range]{width:100%;accent-color:var(--leaf);height:2rem}
 
 <div id="scrim"></div>
 <aside id="drawer" aria-hidden="true">
-  <div class="dh"><svg width="34" height="34" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/></svg><b>みつばち蜜源マップ</b><small>多治見西高等学校 周辺3km ・ v1.10</small></div>
+  <div class="dh"><svg width="34" height="34" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/></svg><b>みつばち蜜源マップ</b><small>多治見西高等学校 周辺3km ・ v1.20</small></div>
   <ul>
     <li><button data-go="plants"><span>🌿</span>植物一覧</button></li>
     <li><button data-go="settings"><span>⚙️</span>設定</button></li>
     <li><button data-go="notices"><span>🔔</span>お知らせ</button></li>
     <li><button data-go="help"><span>💡</span>使い方</button></li>
+    <li class="sep"></li>
+    <li><button data-go="export"><span>📤</span>データの書き出し</button></li>
+    <li><button data-go="import"><span>📥</span>データの読み込み</button></li>
+    <li><button data-go="shot"><span>🖼️</span>地図を画像で保存</button></li>
   </ul>
 </aside>
 
@@ -281,8 +305,8 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 /* ===== 保存データ ===== */
 const KEY='mitsugen-map-v1';
-let S={items:[],notices:[],seeded:false,seenUpdates:[],hidden:[],hiddenItems:[],hiddenRanges:[],toured:false,settings:{mapType:'normal',font:16,toast:true}};
-try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);S=Object.assign(S,d);S.settings=Object.assign({mapType:'normal',font:16,toast:true},d.settings)}}catch(e){}
+let S={items:[],notices:[],seeded:false,seenUpdates:[],hidden:[],hiddenItems:[],hiddenRanges:[],trash:[],bloomMonth:0,bloomRanges:[],bloomUnset:true,toured:false,settings:{mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true}};
+try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);S=Object.assign(S,d);S.settings=Object.assign({mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true},d.settings)}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){flash('保存できませんでした。画像が多すぎる可能性があります');return false}}
 
 /* ===== 地図 ===== */
@@ -321,54 +345,133 @@ L.marker(CENTER,{interactive:false,keyboard:false,icon:L.divIcon({className:'sch
 /* ===== ピン・線の描画 ===== */
 const itemGroup=L.layerGroup().addTo(map);
 const layers=new Map();
-const pinIcon=c=>L.divIcon({className:'pin',html:`<svg viewBox="0 0 32 42" width="32" height="42"><path d="M16 1C8 1 2 7 2 15c0 10 14 26 14 26s14-16 14-26C30 7 24 1 16 1z" fill="${c}" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="15" r="5.5" fill="#fff"/></svg>`,iconSize:[32,42],iconAnchor:[16,41]});
+const pinIcon=c=>{const k=(S.settings.pinSize||100)/100,w=Math.round(32*k),h=Math.round(42*k);return L.divIcon({className:'pin',html:`<svg viewBox="0 0 32 42" width="${w}" height="${h}"><path d="M16 1C8 1 2 7 2 15c0 10 14 26 14 26s14-16 14-26C30 7 24 1 16 1z" fill="${c}" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="15" r="5.5" fill="#fff"/></svg>`,iconSize:[w,h],iconAnchor:[w/2,h-1]})};
 function drawItem(it){
   if(layers.has(it.id)){itemGroup.removeLayer(layers.get(it.id));layers.delete(it.id)}
   const c=safeColor(it.color);let l;
   if(it.type==='point'){
     l=L.marker(it.pts[0],{icon:pinIcon(c),bubblingMouseEvents:false});
-    l.bindTooltip(it.name,{direction:'top',offset:[0,-38]});
+    l.bindTooltip(it.name,{direction:'top',offset:[0,-Math.round(38*(S.settings.pinSize||100)/100)]});
   }else{
-    l=L.featureGroup([L.polyline(it.pts,{color:'#fff',weight:10,opacity:.9,lineCap:'round',bubblingMouseEvents:false}),L.polyline(it.pts,{color:c,weight:6,lineCap:'round',bubblingMouseEvents:false})]);
+    l=L.featureGroup([L.polyline(it.pts,{color:'#fff',weight:(S.settings.lineWidth||6)+4,opacity:.9,lineCap:'round',bubblingMouseEvents:false}),L.polyline(it.pts,{color:c,weight:S.settings.lineWidth||6,lineCap:'round',bubblingMouseEvents:false})]);
     l.bindTooltip(it.name,{sticky:true});
   }
   l.on('click',()=>{if(busy||tmp.length)return;openDetail(it.id)});
   layers.set(it.id,l);
-  if(isShown(it))l.addTo(itemGroup);
 }
 const RANGES=['〜500m','500m〜1km','1〜2km','2〜3km'];
 const repPt=it=>it.type==='point'?it.pts[0]:it.pts[Math.floor(it.pts.length/2)];
 const itemDist=it=>map.distance(CENTER,repPt(it));
 const rangeOf=it=>{const d=itemDist(it);return d<500?0:d<1000?1:d<2000?2:3};
-const isShown=it=>!S.hidden.includes(it.name)&&!S.hiddenItems.includes(it.id)&&!S.hiddenRanges.includes(rangeOf(it));
+const inBloom=(b,m)=>b.from<=b.to?(m>=b.from&&m<=b.to):(m>=b.from||m<=b.to);
+const bloomMonths=b=>{const a=[];let m=b.from;for(let i=0;i<12;i++){a.push(m);if(m===b.to)break;m=m%12+1}return a};
+const bloomHit=(b,p)=>{const pm=bloomMonths(p);return bloomMonths(b).some(m=>pm.includes(m))};
+const bloomOk=it=>!S.bloomRanges.length||(it.bloom?S.bloomRanges.some(p=>bloomHit(it.bloom,p)):S.bloomUnset!==false);
+const bloomText=b=>b.from===b.to?`${b.from}月`:`${b.from}〜${b.to}月`;
+const MOPT='<option value="">未設定</option>'+Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}月</option>`).join('');
+const isShown=it=>!S.hidden.includes(it.name)&&!S.hiddenItems.includes(it.id)&&!S.hiddenRanges.includes(rangeOf(it))&&bloomOk(it);
 function revealItem(it){
   S.hidden=S.hidden.filter(n=>n!==it.name);
   S.hiddenItems=S.hiddenItems.filter(i=>i!==it.id);
   S.hiddenRanges=S.hiddenRanges.filter(r=>r!==rangeOf(it));
+  if(!bloomOk(it))S.bloomRanges=[];
 }
 let editingId=null;
+const CL_PX=44;
+const clusterGroup=L.layerGroup().addTo(map);
+function addCluster(list){
+  const lat=list.reduce((a,i)=>a+i.pts[0][0],0)/list.length,lng=list.reduce((a,i)=>a+i.pts[0][1],0)/list.length;
+  const k=(S.settings.pinSize||100)/100,w=Math.round(32*k),h=Math.round(42*k),c=safeColor(list[0].color);
+  const m=L.marker([lat,lng],{zIndexOffset:500,icon:L.divIcon({className:'pin cl',html:`<svg viewBox="0 0 32 42" width="${w}" height="${h}"><path d="${PIN_PATH}" fill="${c}" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="15" r="5.5" fill="#fff"/></svg><b class="cnt">${list.length}</b>`,iconSize:[w,h],iconAnchor:[w/2,h-1]})});
+  m.bindTooltip(`${list[0].name} ×${list.length}`,{direction:'top',offset:[0,-Math.round(38*k)]});
+  m.on('click',()=>clusterClick(list));
+  m.addTo(clusterGroup);
+}
+function clusterClick(list){
+  const b=L.latLngBounds(list.map(i=>i.pts[0]));
+  const tiny=map.distance(b.getSouthWest(),b.getNorthEast())<2;
+  if(tiny||map.getZoom()>=map.getMaxZoom()-.5){openClusterList(list);return}
+  map.flyToBounds(b.pad(.6),{maxZoom:map.getMaxZoom(),duration:.5});
+}
+function openClusterList(list){
+  const w=document.createElement('div');
+  list.forEach(i=>{
+    const b=el(`<button class="card"><div class="im"><i style="background:${safeColor(i.color)}"></i></div><div class="tx"><b>${esc(i.name)}</b><small>${fmt(i.created)}${i.bloom?` ・ 開花${bloomText(i.bloom)}`:''}</small></div></button>`).firstChild;
+    b.onclick=()=>{closeAllPops();focusItem(i.id)};
+    w.appendChild(b);
+  });
+  openPop({title:`${list[0].name} ×${list.length}`,body:w});
+}
 function applyFilter(){
+  clusterGroup.clearLayers();
+  const gone=new Set();
+  if(S.settings.cluster!==false){
+    const byName=new Map();
+    S.items.filter(it=>layers.has(it.id)&&it.type==='point'&&it.id!==editingId&&isShown(it)).forEach(it=>{if(!byName.has(it.name))byName.set(it.name,[]);byName.get(it.name).push(it)});
+    byName.forEach(list=>{
+      const pts=list.map(it=>({it,p:map.latLngToLayerPoint(it.pts[0])})),used=new Set();
+      pts.forEach(a=>{
+        if(used.has(a.it.id))return;
+        const grp=[a];used.add(a.it.id);
+        pts.forEach(b=>{if(!used.has(b.it.id)&&a.p.distanceTo(b.p)<=CL_PX){grp.push(b);used.add(b.it.id)}});
+        if(grp.length>=2){grp.forEach(g=>gone.add(g.it.id));addCluster(grp.map(g=>g.it))}
+      });
+    });
+  }
   S.items.forEach(it=>{
-    const l=layers.get(it.id);if(!l||it.id===editingId)return;
-    const has=itemGroup.hasLayer(l);
-    if(isShown(it)&&!has)itemGroup.addLayer(l);
-    else if(!isShown(it)&&has)itemGroup.removeLayer(l);
+    const l=layers.get(it.id);if(!l)return;
+    if(it.id===editingId&&it.type==='line')return;
+    const show=isShown(it)&&!gone.has(it.id),has=itemGroup.hasLayer(l);
+    if(show&&!has)itemGroup.addLayer(l);
+    else if(!show&&has)itemGroup.removeLayer(l);
   });
 }
-function updateFilterBadge(){const n=S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length;$('#fcnt').textContent=n;$('#fcnt').hidden=!n}
+map.on('zoomend',()=>applyFilter());
+function updateFilterBadge(){const n=S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length+S.bloomRanges.length;$('#fcnt').textContent=n;$('#fcnt').hidden=!n}
+/* ===== 範囲・開花時期の絞り込み部品(表示する植物/植物一覧で共通) ===== */
+function buildFilterAccs(st,open,onChange,items){
+  const tg=(key,acc)=>{open.has(key)?open.delete(key):open.add(key);acc.classList.toggle('open',open.has(key))};
+  const rc=RANGES.map(()=>0);items.forEach(i=>rc[rangeOf(i)]++);
+  const ra=el(`<div class="acc ${open.has('#range')?'open':''}"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">範囲ごとに切り替え(学校からの距離)</span><small>${st.hiddenRanges.length?`非表示 ${st.hiddenRanges.length}`:'すべて表示'}</small><span class="chev">▸</span></button></div><div class="acc-b"></div></div>`).firstChild;
+  $('.acc-t',ra).onclick=()=>tg('#range',ra);
+  RANGES.forEach((lab,ri)=>{
+    const r=el(`<div class="irow"><label><input type="checkbox" ${st.hiddenRanges.includes(ri)?'':'checked'}><span class="tx2">${lab}</span></label><small>${rc[ri]}件</small></div>`).firstChild;
+    $('input',r).onchange=ev=>{st.hiddenRanges=st.hiddenRanges.filter(x=>x!==ri);if(!ev.target.checked)st.hiddenRanges.push(ri);onChange()};
+    $('.acc-b',ra).appendChild(r);
+  });
+  const nowM=new Date().getMonth()+1;
+  const MS=Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}月</option>`).join('');
+  const ba=el(`<div class="acc ${open.has('#bloom')?'open':''}"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">開花時期で絞り込み</span><small>${st.bloomRanges.length?`${st.bloomRanges.length}期間`:'すべて表示'}</small><span class="chev">▸</span></button></div><div class="acc-b"><div class="cnt" style="margin:.3rem 0">指定した期間のどれかに咲くものだけ表示します(11月〜2月のように年をまたぐ指定もできます)</div><div id="pl-list"></div><div class="btns" style="margin:.4rem 0 .3rem"><button class="ghost" id="padd" type="button">＋ 期間を追加</button><button class="ghost" id="pnow" type="button">今月(${nowM}月)だけ</button><button class="ghost danger" id="pclr" type="button">クリア</button></div><div class="irow"><label><input type="checkbox" id="bu" ${st.bloomUnset!==false?'checked':''}><span class="tx2">開花時期が未設定のものも表示</span></label></div></div></div>`).firstChild;
+  const pl=$('#pl-list',ba);
+  st.bloomRanges.forEach((p,pi)=>{
+    const r=el(`<div class="irow"><select class="mini pf">${MS}</select><span>〜</span><select class="mini pt">${MS}</select><button class="ghost danger go" type="button" aria-label="この期間を削除">×</button></div>`).firstChild;
+    $('.pf',r).value=String(p.from);$('.pt',r).value=String(p.to);
+    $('.pf',r).onchange=e=>{p.from=+e.target.value;onChange()};
+    $('.pt',r).onchange=e=>{p.to=+e.target.value;onChange()};
+    $('.go',r).onclick=()=>{st.bloomRanges.splice(pi,1);onChange()};
+    pl.appendChild(r);
+  });
+  if(!st.bloomRanges.length)pl.innerHTML='<div class="cnt" style="margin:.2rem 0">期間が指定されていません(すべて表示)</div>';
+  $('.acc-t',ba).onclick=()=>tg('#bloom',ba);
+  $('#padd',ba).onclick=()=>{if(st.bloomRanges.length>=6){flash('期間は6つまでです');return}st.bloomRanges.push({from:nowM,to:nowM});open.add('#bloom');onChange()};
+  $('#pnow',ba).onclick=()=>{st.bloomRanges=[{from:nowM,to:nowM}];open.add('#bloom');onChange()};
+  $('#pclr',ba).onclick=()=>{st.bloomRanges=[];onChange()};
+  $('#bu',ba).onchange=e=>{st.bloomUnset=e.target.checked;onChange()};
+  return[ra,ba];
+}
 function openMapFilter(){
   const open=new Set();
   const w=el(`
     <div class="filters" style="grid-template-columns:1fr"><label class="f">検索<input id="mq" type="search" placeholder="植物名で探す"></label></div>
-    <div class="acc open" id="optacc"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">絞り込み・並び替え・一括操作</span><small id="optsum"></small><span class="chev">▸</span></button></div><div class="acc-b">
+    <div class="acc" id="optacc"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">絞り込み・並び替え・範囲・開花時期</span><small id="optsum"></small><span class="chev">▸</span></button></div><div class="acc-b">
       <div class="filters">
         <label class="f">種類<select id="mk"><option value="all">すべて</option><option value="point">点があるもの</option><option value="line">線があるもの</option></select></label>
         <label class="f">状態<select id="ms"><option value="all">すべて</option><option value="on">表示中</option><option value="off">非表示</option></select></label>
         <label class="f">並び替え<select id="mo"><option value="name">名前順</option><option value="count">件数が多い順</option><option value="new">新しい順</option></select></label>
       </div>
       <div class="btns"><button class="ghost" id="fa">一覧をすべて表示</button><button class="ghost" id="fn">一覧をすべて非表示</button></div>
-    </div></div>
-    <div id="fr"></div><div class="cnt" id="fcn"></div><div id="fl"></div>`);
+      <div id="fr"></div>
+    </div></div><div class="cnt" id="fcn"></div><div id="fl"></div>`);
   const all=()=>{
     const m=new Map();
     S.items.forEach(i=>{const e=m.get(i.name)||{name:i.name,items:[],c:i.color,types:new Set(),t:''};e.items.push(i);e.types.add(i.type);if(i.created>e.t)e.t=i.created;m.set(i.name,e)});
@@ -388,23 +491,16 @@ function openMapFilter(){
     if($('#mk',w).value!=='all')parts.push(sel('#mk'));
     if($('#ms',w).value!=='all')parts.push(sel('#ms'));
     if($('#mo',w).value!=='name')parts.push(sel('#mo'));
+    if(S.hiddenRanges.length)parts.push(`範囲 ${S.hiddenRanges.length}`);
+    if(S.bloomRanges.length)parts.push(`開花 ${S.bloomRanges.length}期間`);
     $('#optsum',w).textContent=parts.length?parts.join(' ・ '):'条件なし';
     const ids=S.items.map(i=>i.id),names=all().map(e=>e.name);
     S.hidden=S.hidden.filter(h=>names.includes(h));S.hiddenItems=S.hiddenItems.filter(i=>ids.includes(i));
-    // 範囲
     const fr=$('#fr',w);fr.innerHTML='';
-    const rc=RANGES.map(()=>0);S.items.forEach(i=>rc[rangeOf(i)]++);
-    const ra=el(`<div class="acc ${open.has('#range')?'open':''}"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">範囲ごとに切り替え(学校からの距離)</span><small>${S.hiddenRanges.length?`非表示 ${S.hiddenRanges.length}`:'すべて表示'}</small><span class="chev">▸</span></button></div><div class="acc-b"></div></div>`).firstChild;
-    $('.acc-t',ra).onclick=()=>toggleOpen('#range',ra);
-    RANGES.forEach((lab,ri)=>{
-      const r=el(`<div class="irow"><label><input type="checkbox" ${S.hiddenRanges.includes(ri)?'':'checked'}><span class="tx2">${lab}</span></label><small>${rc[ri]}件</small></div>`).firstChild;
-      $('input',r).onchange=ev=>{S.hiddenRanges=S.hiddenRanges.filter(x=>x!==ri);if(!ev.target.checked)S.hiddenRanges.push(ri);apply()};
-      $('.acc-b',ra).appendChild(r);
-    });
-    fr.appendChild(ra);
+    buildFilterAccs(S,open,apply,S.items).forEach(a=>fr.appendChild(a));
     // 植物
     const list=shown(),fl=$('#fl',w);fl.innerHTML='';
-    $('#fcn',w).textContent=`${list.length}種類 ・ 非表示の設定 ${S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length}`;
+    $('#fcn',w).textContent=`${list.length}種類 ・ 非表示の設定 ${S.hidden.length+S.hiddenItems.length+S.hiddenRanges.length+S.bloomRanges.length}`;
     if(!list.length)fl.innerHTML=`<div class="empty">${S.items.length?'条件に合う植物がありません。':'まだ植物が登録されていません。'}</div>`;
     list.forEach(e=>{
       const vis=!S.hidden.includes(e.name),hiddenIn=e.items.filter(i=>S.hiddenItems.includes(i.id)).length;
@@ -419,7 +515,7 @@ function openMapFilter(){
       $('.acc-t',acc).onclick=()=>toggleOpen(e.name,acc);
       [...e.items].sort((a,b)=>b.created.localeCompare(a.created)).forEach(i=>{
         const byRange=S.hiddenRanges.includes(rangeOf(i));
-        const r=el(`<div class="irow ${vis&&!byRange?'':'dim'}"><label><input type="checkbox" ${S.hiddenItems.includes(i.id)?'':'checked'} ${vis?'':'disabled'}><span class="ty">${i.type==='point'?'点':(i.lineKind==='curve'?'曲線':'直線')}</span><span class="tx2">約${Math.round(itemDist(i)/10)*10}m ・ ${fmt(i.created)}${byRange?' ・ 範囲で非表示':''}</span></label><button class="ghost go" type="button">見る</button></div>`).firstChild;
+        const r=el(`<div class="irow ${vis&&!byRange?'':'dim'}"><label><input type="checkbox" ${S.hiddenItems.includes(i.id)?'':'checked'} ${vis?'':'disabled'}><span class="ty">${i.type==='point'?'点':(i.lineKind==='curve'?'曲線':'直線')}</span><span class="tx2">約${Math.round(itemDist(i)/10)*10}m ・ ${fmt(i.created)}${i.bloom?` ・ 開花${bloomText(i.bloom)}`:''}${byRange?' ・ 範囲で非表示':''}</span></label><button class="ghost go" type="button">見る</button></div>`).firstChild;
         $('input',r).onchange=ev=>{S.hiddenItems=S.hiddenItems.filter(x=>x!==i.id);if(!ev.target.checked)S.hiddenItems.push(i.id);apply()};
         $('.go',r).onclick=()=>{closeAllPops();focusItem(i.id)};
         $('.acc-b',acc).appendChild(r);
@@ -562,7 +658,7 @@ function openNew(d){
 }
 function openDetail(id){const it=S.items.find(i=>i.id===id);if(it)openEditor(it,false)}
 function openEditor(item,isNew){
-  busy=true;updateHint();editingId=item.id;
+  busy=true;updateHint();editingId=item.id;applyFilter();
   let imgs=[...item.images],locked=!isNew;
   let pos=item.pts[0],orig=item.pts[0],saved=false,mk=null;
   const origPts=JSON.stringify(item.pts);
@@ -582,11 +678,13 @@ function openEditor(item,isNew){
     <div class="f">画像を追加(${MAX_IMG}枚まで) <span id="f-cnt" style="font-weight:400"></span>
       <input id="f-file" type="file" accept="image/*" multiple style="display:block;margin-top:.4rem;font-weight:400">
       <div id="f-th" class="thumbs"></div></div>
-    <label class="f">その他<textarea id="f-note" rows="3" maxlength="500" placeholder="開花時期、気づいたことなど"></textarea></label>
+    <div class="f">開花時期<div class="bl"><select id="f-b1">${MOPT}</select><span>〜</span><select id="f-b2">${MOPT}</select></div></div>
+    <label class="f">その他<textarea id="f-note" rows="3" maxlength="500" placeholder="気づいたことなど"></textarea></label>
     <div class="btns" id="f-cbtn" hidden style="margin:0 0 .9rem;flex-wrap:wrap"><button id="b-add" type="button" class="ghost">＋ 曲がる点を追加</button><button id="b-rm" type="button" class="ghost danger">選んだ点を削除</button></div>
     <div class="btns"><button id="b-del" class="ghost danger">削除</button><span class="sp"></span><button id="b-edit" class="ghost">編集</button><button id="b-ok" class="primary">決定</button></div>`);
   const $f=s=>$(s,w);
   $f('#f-name').value=item.name;$f('#f-color').value=safeColor(item.color);$f('#f-note').value=item.note;
+  $f('#f-b1').value=item.bloom?item.bloom.from:'';$f('#f-b2').value=item.bloom?item.bloom.to:'';
   $f('#f-color').oninput=()=>{onColor();if(mk)mk.setIcon(pinIcon(safeColor($f('#f-color').value)))};
   if(item.type==='line'&&mode==='edit'){
     const isCurve=item.lineKind==='curve',MAXP=12;
@@ -600,8 +698,8 @@ function openEditor(item,isNew){
     editLayer=L.layerGroup().addTo(map);
     const old=layers.get(item.id);
     if(!isNew&&old){itemGroup.removeLayer(old);hiddenLayer=old}
-    const casing=L.polyline(linePts(),{color:'#fff',weight:14,opacity:.9,lineCap:'round',bubblingMouseEvents:false}).addTo(editLayer);
-    const line=L.polyline(linePts(),{color:col(),weight:6,lineCap:'round',interactive:false}).addTo(editLayer);
+    const casing=L.polyline(linePts(),{color:'#fff',weight:Math.max((S.settings.lineWidth||6)+4,14),opacity:.9,lineCap:'round',bubblingMouseEvents:false}).addTo(editLayer);
+    const line=L.polyline(linePts(),{color:col(),weight:S.settings.lineWidth||6,lineCap:'round',interactive:false}).addTo(editLayer);
     const guide=isCurve?L.polyline(raw,{color:'#fff',weight:2,dashArray:'4 6',interactive:false}).addTo(editLayer):null;
     const hLayer=L.layerGroup().addTo(editLayer);
     const refreshLine=()=>{const p=linePts();casing.setLatLngs(p);line.setLatLngs(p);if(guide)guide.setLatLngs(raw)};
@@ -668,7 +766,7 @@ function openEditor(item,isNew){
     });
   }
   function lock(){
-    ['#f-name','#f-color','#f-note','#f-file'].forEach(s=>$f(s).disabled=locked);
+    ['#f-name','#f-color','#f-note','#f-file','#f-b1','#f-b2'].forEach(s=>$f(s).disabled=locked);
     $f('#b-edit').disabled=!(locked&&mode==='edit');
     $f('#b-ok').disabled=locked;
     $f('#b-del').hidden=isNew||mode!=='edit';
@@ -685,17 +783,19 @@ function openEditor(item,isNew){
     e.target.value='';thumbs();
   };
   $f('#b-edit').onclick=()=>{locked=false;lock();$f('#f-name').focus()};
-  $f('#b-del').onclick=()=>{
-    if(!confirm(`「${item.name}」を削除しますか?`))return;
+  $f('#b-del').onclick=async()=>{
+    if(!await askConfirm(`「${item.name}」をゴミ箱に移動しますか?\n(植物一覧のゴミ箱から、30日以内なら復元できます)`,'ゴミ箱に移動'))return;
+    const gone=S.items.find(i=>i.id===item.id);
     S.items=S.items.filter(i=>i.id!==item.id);
+    if(gone){S.trash.unshift(Object.assign({},gone,{deletedAt:new Date().toISOString()}));S.trash=S.trash.slice(0,50)}
     if(layers.has(item.id)){itemGroup.removeLayer(layers.get(item.id));layers.delete(item.id)}
-    save();saved=true;pop.close();addNotice('del',`「${item.name}」を削除しました`,`${kind}の登録を削除しました。`);
+    save();saved=true;pop.close();applyFilter();addNotice('del',`「${item.name}」をゴミ箱に移動しました`,`${kind}をゴミ箱に移動しました。\n植物一覧の「ゴミ箱」から、30日以内なら復元できます。`);
   };
   $f('#b-ok').onclick=()=>{
     const name=$f('#f-name').value.trim();
     if(!name){const e=$f('#f-err');e.textContent='植物名を入力してください';e.hidden=false;$f('#f-name').focus();return}
     const now=new Date().toISOString();
-    const data={name,color:$f('#f-color').value,images:imgs,note:$f('#f-note').value.trim(),updated:now};
+    const data={name,color:$f('#f-color').value,images:imgs,note:$f('#f-note').value.trim(),updated:now,bloom:(()=>{const a=+$f('#f-b1').value,b=+$f('#f-b2').value;return a?{from:a,to:b||a}:null})()};
     if(item.type==='point')data.pts=[pos];
     else if(raw){data.pts=w._linePts();data.raw=raw.map(p=>p.slice())}
     if(isNew){
@@ -717,37 +817,80 @@ function openEditor(item,isNew){
     busy=false;editingId=null;
     if(mk){mk.off('drag',onDrag);mk.off('dragend',onDragEnd);if(mk.dragging)mk.dragging.disable();if(!isNew&&!saved){mk.setLatLng(orig);mk.setIcon(pinIcon(safeColor(item.color)))}}
     if(editLayer){map.removeLayer(editLayer);if(!saved&&hiddenLayer)itemGroup.addLayer(hiddenLayer)}
-    resetDraw();
+    resetDraw();applyFilter();
   }});
 }
 
 /* ===== 植物一覧 ===== */
 function openPlants(){
-  const w=el(`
-    <div class="filters">
-      <label class="f wide">検索<input id="q" type="search" placeholder="植物名・メモで探す"></label>
-      <label class="f">種類<select id="ft"><option value="all">すべて</option><option value="point">点</option><option value="line">線</option></select></label>
-      <label class="f">並び替え<select id="so"><option value="new">新しい順</option><option value="old">古い順</option><option value="name">名前順</option></select></label>
-      <label class="chk wide"><input type="checkbox" id="fi">画像あり</label>
+  const open=new Set(),lf={hiddenRanges:[],bloomRanges:[],bloomUnset:true};
+  const w=el(`<div class="toprow"><label class="f" id="sw">検索<input id="q" type="search" placeholder="植物名・メモで探す"></label><div class="seg full" id="tabs"><button type="button" data-t="list" aria-pressed="true">一覧</button><button type="button" data-t="trash" aria-pressed="false">🗑 ゴミ箱 <span id="tc"></span></button></div></div>
+    <div id="pl">
+      <div class="acc" id="optacc"><div class="acc-h"><button class="acc-t" type="button"><span class="nm">絞り込み・並び替え・範囲・開花時期</span><small id="optsum"></small><span class="chev">▸</span></button></div><div class="acc-b">
+        <div class="filters">
+          <label class="f">種類<select id="ft"><option value="all">すべて</option><option value="point">点</option><option value="line">線</option></select></label>
+          <label class="f">状態<select id="fv"><option value="all">すべて</option><option value="on">地図に表示中</option><option value="off">地図で非表示</option></select></label>
+          <label class="f">並び替え<select id="so"><option value="new">新しい順</option><option value="old">古い順</option><option value="name">名前順</option></select></label>
+        </div>
+        <label class="chk" style="margin:0 0 .5rem"><input type="checkbox" id="fi">画像あり</label>
+        <div id="fr"></div>
+      </div></div>
+      <div class="cnt" id="cnt"></div><div id="ls"></div>
     </div>
-    <div class="cnt" id="cnt"></div><div id="ls"></div>`);
+    <div id="tr" hidden></div>`);
+  const sel=id=>$(id,w).selectedOptions[0].textContent;
   const draw=()=>{
-    const q=$('#q',w).value.trim().toLowerCase(),ft=$('#ft',w).value,so=$('#so',w).value,fi=$('#fi',w).checked;
-    let a=S.items.filter(i=>(ft==='all'||i.type===ft)&&(!fi||i.images.length)&&(!q||(i.name+' '+i.note).toLowerCase().includes(q)));
+    const q=$('#q',w).value.trim().toLowerCase(),ft=$('#ft',w).value,fv=$('#fv',w).value,so=$('#so',w).value,fi=$('#fi',w).checked;
+    const parts=[];
+    if(ft!=='all')parts.push(sel('#ft'));if(fv!=='all')parts.push(sel('#fv'));if(so!=='new')parts.push(sel('#so'));if(fi)parts.push('画像あり');
+    if(lf.hiddenRanges.length)parts.push(`範囲 ${lf.hiddenRanges.length}`);
+    if(lf.bloomRanges.length)parts.push(`開花 ${lf.bloomRanges.length}期間`);
+    $('#optsum',w).textContent=parts.length?parts.join(' ・ '):'条件なし';
+    let a=S.items.filter(i=>(ft==='all'||i.type===ft)&&(fv==='all'||(fv==='on')===isShown(i))&&(!fi||i.images.length)
+      &&!lf.hiddenRanges.includes(rangeOf(i))
+      &&(!lf.bloomRanges.length||(i.bloom?lf.bloomRanges.some(p=>bloomHit(i.bloom,p)):lf.bloomUnset!==false))
+      &&(!q||(i.name+' '+i.note).toLowerCase().includes(q)));
     a.sort((x,y)=>so==='name'?x.name.localeCompare(y.name,'ja'):so==='old'?x.created.localeCompare(y.created):y.created.localeCompare(x.created));
     $('#cnt',w).textContent=`${a.length}件`;
+    $('#tc',w).textContent=S.trash.length?`(${S.trash.length})`:'';
     const ls=$('#ls',w);ls.innerHTML='';
     if(!a.length){ls.innerHTML=`<div class="empty">${S.items.length?'条件に合う植物がありません。':'まだ植物が登録されていません。<br>編集に切り替えて、地図をタップして追加しましょう。'}</div>`;return}
     a.forEach(i=>{
       const kind=i.type==='point'?'点':(i.lineKind==='curve'?'曲線':'直線');
-      const b=el(`<button class="card"><div class="im">${i.images[0]?'<img alt="">':`<i style="background:${safeColor(i.color)}"></i>`}</div><div class="tx"><b>${esc(i.name)}</b><small>${kind} ・ ${fmt(i.created)}${i.images.length?` ・ 画像${i.images.length}`:''}</small></div></button>`).firstChild;
+      const b=el(`<button class="card"><div class="im">${i.images[0]?'<img alt="">':`<i style="background:${safeColor(i.color)}"></i>`}</div><div class="tx"><b>${esc(i.name)}</b><small>${kind} ・ ${fmt(i.created)}${i.bloom?` ・ 開花${bloomText(i.bloom)}`:''}${i.images.length?` ・ 画像${i.images.length}`:''}</small></div></button>`).firstChild;
       if(i.images[0])$('img',b).src=i.images[0];
       b.onclick=()=>{closeAllPops();focusItem(i.id)};
       ls.appendChild(b);
     });
   };
-  ['input','change'].forEach(ev=>w.addEventListener(ev,draw));
-  draw();openPop({title:'植物一覧',body:w,cls:'compact'});
+  const buildFr=()=>{const fr=$('#fr',w);fr.innerHTML='';buildFilterAccs(lf,open,refresh,S.items).forEach(a=>fr.appendChild(a))};
+  const refresh=()=>{buildFr();draw()};
+  $('#optacc .acc-t',w).onclick=()=>$('#optacc',w).classList.toggle('open');
+  const drawTrash=()=>{
+    const tr=$('#tr',w);tr.innerHTML='';
+    $('#tc',w).textContent=S.trash.length?`(${S.trash.length})`:'';
+    if(!S.trash.length){tr.innerHTML='<div class="empty">ゴミ箱は空です。<br>削除した植物は30日間ここに残り、復元できます。</div>';return}
+    const top=el(`<div class="btns" style="margin:0 0 .5rem"><span class="sp"></span><button class="ghost danger" id="te" type="button" style="flex:none">ゴミ箱を空にする</button></div>`).firstChild;
+    $('#te',top).onclick=async()=>{if(!await askConfirm('ゴミ箱の中身をすべて完全に削除します。元に戻せません。','空にする'))return;S.trash=[];save();drawTrash()};
+    tr.appendChild(top);
+    S.trash.forEach(i=>{
+      const days=Math.max(0,30-Math.floor((Date.now()-new Date(i.deletedAt).getTime())/864e5));
+      const c=el(`<div class="card"><div class="im">${i.images&&i.images[0]?'<img alt="">':`<i style="background:${safeColor(i.color)}"></i>`}</div><div class="tx"><b>${esc(i.name)}</b><small>削除 ${fmt(i.deletedAt)} ・ あと${days}日</small></div><button class="ghost go" data-a="r" type="button">復元</button><button class="ghost danger go" data-a="d" type="button">消す</button></div>`).firstChild;
+      if(i.images&&i.images[0])$('img',c).src=i.images[0];
+      $('[data-a=r]',c).onclick=()=>{restoreItem(i.id);drawTrash();refresh()};
+      $('[data-a=d]',c).onclick=async()=>{if(!await askConfirm(`「${i.name}」を完全に削除します。元に戻せません。`,'完全に削除'))return;S.trash=S.trash.filter(t=>t.id!==i.id);save();drawTrash()};
+      tr.appendChild(c);
+    });
+  };
+  $('#tabs',w).onclick=e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#tabs button',w).forEach(x=>x.setAttribute('aria-pressed',x===b));
+    $('#pl',w).hidden=b.dataset.t!=='list';$('#tr',w).hidden=b.dataset.t!=='trash';
+    $('#sw',w).style.visibility=b.dataset.t==='list'?'':'hidden';
+    if(b.dataset.t==='trash')drawTrash();
+  };
+  ['input','change'].forEach(ev=>w.addEventListener(ev,e=>{if(e.target.matches('#q,#ft,#fv,#so,#fi'))draw()}));
+  buildFr();draw();openPop({title:'植物一覧',body:w,cls:'compact'});
 }
 function focusItem(id){
   const it=S.items.find(i=>i.id===id),l=layers.get(id);if(!it||!l)return;
@@ -767,7 +910,7 @@ function addNotice(kind,title,body,itemId,silent){
 function updateBadge(){const u=S.notices.filter(n=>!n.read).length;$('#badge').textContent=u;$('#badge').hidden=!u}
 function showToast(t,life){
   const box=$('#toasts');
-  while(box.children.length>=5)box.firstChild.remove();
+  while(box.children.length>=3)box.firstChild.remove();
   box.appendChild(t);
   setTimeout(()=>t.classList.add('fade'),life-1600);
   setTimeout(()=>t.remove(),life);
@@ -823,13 +966,21 @@ function openSettings(){
   const w=el(`
     <div class="set"><h3>マップの種類</h3><div class="seg full" id="mt"><button data-t="normal" aria-pressed="${s.mapType==='normal'}">普通</button><button data-t="sat" aria-pressed="${s.mapType==='sat'}">衛星</button></div></div>
     <div class="set"><h3>文字のサイズ <span id="fv" style="font-weight:400">${s.font}px</span></h3><input type="range" id="fs" min="12" max="24" step="1" value="${s.font}"><p style="margin:.3rem 0 0">この大きさで文字が表示されます。</p></div>
+    <div class="set"><h3>ピンのサイズ <span id="pv" style="font-weight:400">${s.pinSize}%</span></h3><input type="range" id="ps" min="50" max="200" step="10" value="${s.pinSize}"></div>
+    <div class="set"><h3>線の太さ <span id="lv" style="font-weight:400">${s.lineWidth}px</span></h3><input type="range" id="lw" min="2" max="14" step="1" value="${s.lineWidth}"></div>
     <div class="set"><div class="row"><h3 style="margin:0">お知らせのトースト表示</h3><label class="sw"><input type="checkbox" id="ts" ${s.toast?'checked':''}><i></i></label></div></div>
-    <div class="set"><div class="row"><h3 style="margin:0">現在地を表示</h3><label class="sw"><input type="checkbox" id="lc" ${watchId!==null?'checked':''}><i></i></label></div></div>`);
+    <div class="set"><div class="row"><h3 style="margin:0">現在地を表示</h3><label class="sw"><input type="checkbox" id="lc" ${watchId!==null?'checked':''}><i></i></label></div></div>
+    <div class="set"><div class="row"><h3 style="margin:0">近い同じ名前のピンをまとめる</h3><label class="sw"><input type="checkbox" id="cl" ${s.cluster!==false?'checked':''}><i></i></label></div></div>`);
   $('#mt',w).onclick=e=>{const b=e.target.closest('button');if(!b)return;s.mapType=b.dataset.t;setMapType(s.mapType);$$('#mt button',w).forEach(x=>x.setAttribute('aria-pressed',x===b));save()};
   $('#fs',w).oninput=e=>{s.font=+e.target.value;$('#fv',w).textContent=s.font+'px';applyFont()};
   $('#fs',w).onchange=save;
+  $('#ps',w).oninput=e=>{s.pinSize=+e.target.value;$('#pv',w).textContent=s.pinSize+'%';S.items.forEach(drawItem);applyFilter()};
+  $('#ps',w).onchange=save;
+  $('#lw',w).oninput=e=>{s.lineWidth=+e.target.value;$('#lv',w).textContent=s.lineWidth+'px';S.items.forEach(drawItem);applyFilter()};
+  $('#lw',w).onchange=save;
   $('#ts',w).onchange=e=>{s.toast=e.target.checked;save()};
   $('#lc',w).onchange=e=>setLocate(e.target.checked);
+  $('#cl',w).onchange=e=>{s.cluster=e.target.checked;save();applyFilter()};
   openPop({title:'設定',body:w});
 }
 
@@ -844,10 +995,15 @@ function go(n){
   if(n==='plants')openPlants();
   else if(n==='settings')openSettings();
   else if(n==='notices')openNotices();
+  else if(n==='account')openAccount();
+  else if(n==='export')openExport();
+  else if(n==='import')openImport();
+  else if(n==='shot')openShot();
   else if(n==='help')setTimeout(startTour,260);
 }
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 $('#btn-bell').onclick=()=>go('notices');
+$('#btn-account').onclick=()=>go('account');
 
 /* ===== コーチマーク(使い方) ===== */
 const circleRect=()=>{
@@ -862,7 +1018,8 @@ const STEPS=[
   {sel:'#btn-loc',mode:'view',t:'現在地ボタンで、いまいる場所を地図に表示します(位置情報の許可が必要です)。もう一度押すと現在地に戻ります。'},
   {sel:'#mode',mode:'view',t:'右下で「閲覧」と「編集」を切り替えます。植物を登録できるのは「編集」のときだけです。'},
   {sel:'#tools',mode:'edit',t:'編集では「点」か「線」を選びます。線は直線か曲線を選べます。地図をタップして場所を決め、出てきた画面に植物の情報を入れて「決定」を押します。曲線は「開始点→曲げる点→終わる点」の順にタップします。'},
-  {sel:'#btn-bell',mode:'view',t:'植物の追加や編集、アップデートのお知らせがここに届きます。数字は未読の数です。'}
+  {sel:'#btn-bell',mode:'view',t:'植物の追加や編集、アップデートのお知らせがここに届きます。数字は未読の数です。'},
+  {sel:'#btn-account',mode:'view',t:'右上のアカウントマークから、アカウントの作成や設定の画面を開けます。共有機能は準備中で、まだ使えません。'}
 ];
 function startTour(){
   closeAllPops();closeDrawer();
@@ -885,9 +1042,230 @@ function startTour(){
   show();
 }
 
+/* ===== ゴミ箱の復元 ===== */
+function restoreItem(id){
+  const t=S.trash.find(i=>i.id===id);if(!t)return;
+  S.trash=S.trash.filter(i=>i.id!==id);
+  const it=Object.assign({},t);delete it.deletedAt;
+  S.items.push(it);revealItem(it);drawItem(it);applyFilter();updateFilterBadge();save();
+  addNotice('add',`「${it.name}」を復元しました`,'ゴミ箱から元に戻しました。',it.id);
+}
+
+/* ===== アカウント(準備中: まだ使えません) ===== */
+function openAccount(){
+  const w=el(`<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem"><div class="avatar"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2F5D3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></div><div><b>ゲスト</b><br><small style="color:var(--mut)">ログインしていません</small></div></div>
+    <div class="soon-note">🔒 共有機能は準備中です。いまは、登録した内容はこの端末のブラウザの中にだけ保存されます。アカウントを作ると、複数人で同じ地図に登録・保存できるようになる予定です。</div>
+    <div class="btns" style="margin:.9rem 0"><button class="primary" type="button" disabled>ログイン</button><button class="ghost" type="button" disabled>アカウントを作成</button></div>
+    <div class="set"><h3>アカウント設定 <span class="chip">準備中</span></h3>
+      <label class="f">表示名<input type="text" disabled placeholder="例:たろう"></label>
+      <label class="f">メールアドレス<input type="text" disabled placeholder="example@mail.com"></label>
+      <button class="ghost" type="button" disabled>パスワードを変更</button></div>
+    <div class="set"><h3>共有マップ <span class="chip">準備中</span></h3>
+      <label class="f">自分の権限<select disabled><option>編集できる</option><option>閲覧のみ</option></select></label>
+      <div class="btns"><button class="ghost" type="button" disabled>招待リンクを作る</button><button class="ghost" type="button" disabled>メンバーを見る</button></div></div>
+    <div class="set"><div class="btns"><button class="ghost danger" type="button" disabled>ログアウト</button><button class="ghost danger" type="button" disabled>アカウントを削除</button></div></div>`);
+  openPop({title:'アカウント',body:w});
+}
+
+/* ===== 共通 ===== */
+function askConfirm(msg,okLabel='OK'){
+  return new Promise(res=>{
+    let done=false;
+    const w=el('<p style="margin:0 0 1rem;line-height:1.8;white-space:pre-wrap"></p><div class="btns"><button class="ghost" id="cn" type="button">キャンセル</button><span class="sp"></span><button class="primary" id="co" type="button" style="background:var(--danger);border-color:var(--danger)"></button></div>');
+    $('p',w).textContent=msg;$('#co',w).textContent=okLabel;
+    const p=openPop({title:'確認',body:w,onClose:()=>{if(!done){done=true;res(false)}}});
+    $('#cn',w).onclick=()=>p.close();
+    $('#co',w).onclick=()=>{done=true;res(true);p.close()};
+  });
+}
+function download(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+}
+function info(msg){const t=el('<div class="toast" role="status"></div>').firstChild;t.textContent=msg;showToast(t,3500)}
+const today=()=>new Date().toISOString().slice(0,10);
+
+/* ===== データの書き出し・読み込み ===== */
+function openExport(){
+  const w=el(`<p style="margin:0 0 1rem;line-height:1.8">登録した植物(${S.items.length}件)とゴミ箱(${S.trash.length}件)を、1つのファイルに書き出します。画像も入ります。バックアップや、別の端末への引っ越しに使えます。</p><button class="primary" id="ex" type="button" style="width:100%">ファイルに書き出す</button>`);
+  $('#ex',w).onclick=()=>{
+    const data={app:'mitsugen-map',version:1,exportedAt:new Date().toISOString(),items:S.items,trash:S.trash};
+    download(new Blob([JSON.stringify(data)],{type:'application/json'}),`mitsugen-map-${today()}.json`);
+    info('ファイルに書き出しました');
+  };
+  openPop({title:'データの書き出し',body:w});
+}
+function cleanItem(o){
+  if(!o||typeof o!=='object')return null;
+  const type=o.type==='line'?'line':o.type==='point'?'point':null;if(!type)return null;
+  const okPt=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite);
+  const pts=(Array.isArray(o.pts)?o.pts:[]).slice(0,500).filter(okPt).map(p=>[p[0],p[1]]);
+  if(type==='point'?pts.length<1:pts.length<2)return null;
+  if(!pts.every(p=>map.distance(CENTER,p)<=R+100))return null;
+  const name=String(o.name||'').trim().slice(0,40);if(!name)return null;
+  const now=new Date().toISOString();
+  const it={id:typeof o.id==='string'&&o.id?o.id.slice(0,40):uid(),type,name,pts:type==='point'?[pts[0]]:pts,color:safeColor(o.color),
+    images:(Array.isArray(o.images)?o.images:[]).filter(x=>typeof x==='string'&&/^data:image\/(jpeg|png|webp|gif);base64,/.test(x)).slice(0,MAX_IMG),
+    note:String(o.note||'').slice(0,500),created:typeof o.created==='string'?o.created:now,updated:typeof o.updated==='string'?o.updated:now};
+  if(type==='line'){
+    it.lineKind=o.lineKind==='curve'?'curve':'straight';
+    const raw=(Array.isArray(o.raw)?o.raw:[]).slice(0,12).filter(okPt).map(p=>[p[0],p[1]]);
+    if(raw.length>=2)it.raw=raw;
+  }
+  const b=o.bloom,okM=m=>Number.isInteger(m)&&m>=1&&m<=12;
+  if(b&&okM(b.from)&&okM(b.to))it.bloom={from:b.from,to:b.to};
+  return it;
+}
+function openImport(){
+  const w=el(`<p style="margin:0 0 .8rem;line-height:1.8">「データの書き出し」で保存したファイル(.json)を選んでください。</p><input id="im" type="file" accept=".json,application/json" style="display:block;margin-bottom:1rem"><div id="imr"></div>`);
+  let parsed=null;
+  $('#im',w).onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    const out=$('#imr',w);out.innerHTML='';parsed=null;
+    const bad=m=>{out.innerHTML=`<div class="err">${m}</div>`};
+    if(f.size>30*1024*1024){bad('ファイルが大きすぎます(30MBまで)');return}
+    let d;try{d=JSON.parse(await f.text())}catch(_){bad('ファイルを読み込めませんでした。書き出したファイルか確認してください。');return}
+    if(!d||d.app!=='mitsugen-map'||!Array.isArray(d.items)){bad('このアプリで書き出したファイルではありません。');return}
+    let skipped=0;const items=[],trash=[];
+    d.items.forEach(o=>{const c=cleanItem(o);c?items.push(c):skipped++});
+    (Array.isArray(d.trash)?d.trash:[]).forEach(o=>{const c=cleanItem(o);if(c){c.deletedAt=typeof o.deletedAt==='string'?o.deletedAt:new Date().toISOString();trash.push(c)}});
+    parsed={items,trash};
+    out.innerHTML=`<div class="cnt">植物 ${items.length}件 ・ ゴミ箱 ${trash.length}件${skipped?` ・ 読み込めなかった ${skipped}件`:''}</div>
+      <label class="chk" style="margin:.5rem 0"><input type="radio" name="imm" value="merge" checked>いまのデータに追加する</label>
+      <label class="chk" style="margin:.5rem 0"><input type="radio" name="imm" value="replace">いまのデータを置き換える</label>
+      <div class="btns"><span class="sp"></span><button class="primary" id="imgo" type="button">読み込む</button></div>`;
+    $('#imgo',w).onclick=async()=>{
+      const mode=$('input[name=imm]:checked',w).value;
+      if(mode==='replace'&&!await askConfirm('いまのデータを消して、ファイルの内容に置き換えます。よろしいですか?','置き換える'))return;
+      if(mode==='replace'){S.items=parsed.items;S.trash=parsed.trash;S.hidden=[];S.hiddenItems=[];S.hiddenRanges=[]}
+      else{
+        const ids=new Set([...S.items,...S.trash].map(i=>i.id));
+        parsed.items.forEach(i=>{if(ids.has(i.id))i.id=uid();ids.add(i.id);S.items.push(i)});
+        parsed.trash.forEach(i=>{if(ids.has(i.id))i.id=uid();ids.add(i.id);S.trash.push(i)});
+      }
+      itemGroup.clearLayers();layers.clear();S.items.forEach(drawItem);applyFilter();updateFilterBadge();save();
+      const n=parsed.items.length,m=parsed.trash.length;
+      closeAllPops();
+      addNotice('add','データを読み込みました',`植物${n}件、ゴミ箱${m}件を読み込みました。(${mode==='replace'?'置き換え':'追加'})`);
+    };
+  };
+  openPop({title:'データの読み込み',body:w});
+}
+
+/* ===== 地図を画像で保存 ===== */
+const PIN_PATH='M16 1C8 1 2 7 2 15c0 10 14 26 14 26s14-16 14-26C30 7 24 1 16 1z';
+async function renderMap({range,width,items,names,rings,dark}){
+  const b=range==='view'?map.getBounds():L.latLngBounds(ringPts(+range));
+  const south=b.getSouth(),north=b.getNorth(),west=b.getWest(),east=b.getEast();
+  let z=Math.floor(Math.log2(width*360/(256*(east-west))));z=Math.max(10,Math.min(18,z));
+  const ws=256*Math.pow(2,z);
+  const X=lng=>(lng+180)/360*ws;
+  const Y=lat=>{const r=lat*Math.PI/180;return(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*ws};
+  const x0=X(west),x1=X(east),y0=Y(north),y1=Y(south);
+  const W=Math.round(x1-x0),H=Math.round(y1-y0),f=Math.max(1,W/1200);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d');
+  const P=(lat,lng)=>[X(lng)-x0,Y(lat)-y0];
+  g.fillStyle='#dfe8d2';g.fillRect(0,0,W,H);
+  // 地図タイル
+  const sat=S.settings.mapType==='sat';
+  const path=sat?'seamlessphoto/{z}/{x}/{y}.jpg':'std/{z}/{x}/{y}.png';
+  const jobs=[];
+  for(let tx=Math.floor(x0/256);tx<=Math.floor((x1-1)/256);tx++)for(let ty=Math.floor(y0/256);ty<=Math.floor((y1-1)/256);ty++){
+    jobs.push(new Promise(res=>{
+      const im=new Image();im.crossOrigin='anonymous';
+      im.onload=()=>{g.drawImage(im,tx*256-x0,ty*256-y0);res(true)};
+      im.onerror=()=>res(false);
+      im.src=GSI+path.replace('{z}',z).replace('{x}',tx).replace('{y}',ty);
+    }));
+  }
+  if(!(await Promise.all(jobs)).some(Boolean))throw new Error('tiles');
+  const trace=pts=>pts.forEach((p,i)=>{const[x,y]=P(p[0],p[1]);i?g.lineTo(x,y):g.moveTo(x,y)});
+  const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()};
+  const halo=(t,x,y,size,color)=>{g.font=`700 ${size}px "Hiragino Sans","Noto Sans JP",sans-serif`;g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=size/3;g.strokeStyle='#fff';g.strokeText(t,x,y);g.fillStyle=color;g.fillText(t,x,y)};
+  // 3km外を暗く
+  if(dark){g.beginPath();g.rect(0,0,W,H);trace(ringPts(R));g.closePath();g.fillStyle='rgba(0,0,0,.5)';g.fill('evenodd')}
+  // 距離の円
+  if(rings){
+    const col=sat?'#FFE680':'#2F5D3A';
+    RINGS.forEach(r=>{g.beginPath();trace(ringPts(r));g.closePath();g.setLineDash([12*f,14*f]);g.lineWidth=2.5*f;g.strokeStyle=col;g.stroke()});
+    g.setLineDash([]);
+    RINGS.forEach(r=>{
+      const[x,y]=P(CENTER[0]+r/111320,CENTER[1]),t=r>=1000?r/1000+'km':r+'m',size=13*f;
+      g.font=`700 ${size}px "Hiragino Sans",sans-serif`;
+      const tw=g.measureText(t).width+14*f,th=size+8*f;
+      rr(x-tw/2,y-th/2,tw,th,th/2);g.fillStyle='#fff';g.fill();g.lineWidth=1.5*f;g.strokeStyle='#2F5D3A';g.stroke();
+      g.fillStyle='#1F4129';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x,y+f*.5);
+    });
+    const[sx,sy]=P(CENTER[0],CENTER[1]);
+    g.beginPath();g.arc(sx,sy,13*f,0,Math.PI*2);g.fillStyle='#2F5D3A';g.fill();g.lineWidth=3*f;g.strokeStyle='#fff';g.stroke();
+    halo('校',sx,sy,13*f,'#fff');g.fillStyle='#fff';g.fillText('校',sx,sy);
+  }
+  // ピンと線
+  if(items){
+    const k=(S.settings.pinSize||100)/100,lw=S.settings.lineWidth||6,vis=S.items.filter(isShown);
+    vis.filter(i=>i.type==='line').forEach(i=>{
+      g.lineCap='round';g.lineJoin='round';
+      g.beginPath();trace(i.pts);g.lineWidth=(lw+4)*f;g.strokeStyle='rgba(255,255,255,.9)';g.stroke();
+      g.beginPath();trace(i.pts);g.lineWidth=lw*f;g.strokeStyle=safeColor(i.color);g.stroke();
+      if(names){const m=i.pts[Math.floor(i.pts.length/2)],[x,y]=P(m[0],m[1]);halo(i.name,x,y-14*f,14*f,'#1D2A21')}
+    });
+    const pin=new Path2D(PIN_PATH);
+    vis.filter(i=>i.type==='point').forEach(i=>{
+      const[x,y]=P(i.pts[0][0],i.pts[0][1]),s=k*f;
+      g.save();g.translate(x-16*s,y-41*s);g.scale(s,s);
+      g.fillStyle=safeColor(i.color);g.fill(pin);g.lineWidth=2.5;g.strokeStyle='#fff';g.stroke(pin);
+      g.beginPath();g.arc(16,15,5.5,0,Math.PI*2);g.fillStyle='#fff';g.fill();g.restore();
+      if(names)halo(i.name,x,y-42*s-8*f,14*f,'#1D2A21');
+    });
+  }
+  // 出典
+  g.textAlign='right';g.font=`${11*f}px "Hiragino Sans",sans-serif`;g.textBaseline='bottom';g.lineJoin='round';
+  g.lineWidth=3*f;g.strokeStyle='#fff';g.strokeText('出典: 国土地理院',W-8*f,H-6*f);g.fillStyle='#333';g.fillText('出典: 国土地理院',W-8*f,H-6*f);
+  return cv;
+}
+function openShot(){
+  let curUrl=null;
+  const w=el(`<label class="f">保存する範囲<select id="sr"><option value="view">いま見ている範囲</option><option value="3000">3km圏ぜんぶ</option><option value="2000">2km圏</option><option value="1000">1km圏</option><option value="500">500m圏</option></select></label>
+    <label class="f">画像の大きさ<select id="sz"><option value="1200">小(軽い)</option><option value="2000" selected>標準</option><option value="3200">大(きれい)</option></select></label>
+    <div class="f">含めるもの
+      <label class="chk" style="margin-top:.5rem"><input type="checkbox" id="s-items" checked>ピンと線</label>
+      <label class="chk" style="margin-top:.5rem"><input type="checkbox" id="s-names" checked>植物名</label>
+      <label class="chk" style="margin-top:.5rem"><input type="checkbox" id="s-rings" checked>距離の円とラベル</label>
+      <label class="chk" style="margin-top:.5rem"><input type="checkbox" id="s-dark" checked>3km外を暗くする</label>
+    </div>
+    <div class="btns"><span class="sp"></span><button class="primary" id="s-go" type="button">画像を作る</button></div>
+    <div id="s-out" hidden></div>`);
+  $('#s-go',w).onclick=async()=>{
+    const btn=$('#s-go',w),out=$('#s-out',w);
+    btn.disabled=true;btn.textContent='作成中…';
+    try{
+      const cv=await renderMap({range:$('#sr',w).value,width:+$('#sz',w).value,items:$('#s-items',w).checked,names:$('#s-names',w).checked,rings:$('#s-rings',w).checked,dark:$('#s-dark',w).checked});
+      const blob=await new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('blob')),'image/jpeg',.92));
+      if(curUrl)URL.revokeObjectURL(curUrl);curUrl=URL.createObjectURL(blob);
+      out.hidden=false;
+      out.innerHTML=`<img alt="作成した地図の画像" style="width:100%;border-radius:.8rem;display:block;margin:.9rem 0 .4rem"><div class="cnt">${cv.width}×${cv.height}px ・ 画像を長押しして写真に追加もできます</div><button class="primary" id="s-save" type="button" style="width:100%">画像を保存する</button>`;
+      $('img',out).src=curUrl;
+      $('#s-save',out).onclick=async()=>{
+        const name=`mitsugen-map-${today()}.jpg`,file=new File([blob],name,{type:'image/jpeg'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==='AbortError')return}
+        }
+        download(blob,name);info('画像を保存しました');
+      };
+    }catch(e){
+      flash(e&&e.message==='tiles'?'地図画像を取得できませんでした。通信を確認してください':'画像を作れませんでした(地図データの取得制限の可能性があります)');
+    }finally{btn.disabled=false;btn.textContent='画像を作る'}
+  };
+  openPop({title:'地図を画像で保存',body:w,onClose:()=>{if(curUrl)URL.revokeObjectURL(curUrl)}});
+}
+
 /* ===== 起動 ===== */
 applyFont();setMapType(S.settings.mapType);
-S.items.forEach(drawItem);
+if(!Array.isArray(S.bloomRanges))S.bloomRanges=[];
+if(S.bloomMonth){S.bloomRanges=[{from:S.bloomMonth,to:S.bloomMonth}];S.bloomMonth=0}
+{const lim=Date.now()-30*864e5,n=S.trash.length;S.trash=S.trash.filter(t=>!t.deletedAt||new Date(t.deletedAt).getTime()>lim);if(S.trash.length!==n)save()}
+S.items.forEach(drawItem);applyFilter();
 const firstRun=!S.seeded;
 if(!S.seeded){S.seeded=true;addNotice('upd','みつばち蜜源マップへようこそ','多治見西高校から3km圏内の蜜源植物を、点と線で登録できます。\n\n「編集」に切り替えて地図をタップすると登録できます。使い方はメニューの「使い方」から見られます。',null,true)}
 const UPDATES=[
@@ -900,7 +1278,17 @@ const UPDATES=[
   {id:'v1.7',title:'アップデート v1.7',body:'・「植物一覧」と「表示する植物」の画面を大きくしました\n・「表示する植物」の並び替えを、種類・状態と同じ行に移しました\n・地図をさらに拡大できるようになりました(拡大しすぎると画質は粗くなります)'},
   {id:'v1.8',title:'アップデート v1.8',body:'・「植物一覧」と「表示する植物」の画面を縦にも大きくしました'},
   {id:'v1.9',title:'アップデート v1.9',body:'・「表示する植物」をアコーディオンにしました。植物名をタップすると、その植物の点・線が一件ずつ開きます\n・一件ごとに表示/非表示を切り替えられます。「見る」で地図の場所へ移動します\n・「範囲ごとに切り替え」で、学校から500m・1km・2km・3kmの区間ごとに表示/非表示を切り替えられます\n・新しく登録したり編集したピンは、自動で表示に戻ります'},
-  {id:'v1.10',title:'アップデート v1.10',body:'・「表示する植物」の「絞り込み・並び替え・一括操作」(種類・状態・並び替え・一覧をすべて表示/非表示)を折りたためるようにしました\n・折りたたんだままでも、いま選んでいる条件が横に表示されます'}
+  {id:'v1.10',title:'アップデート v1.10',body:'・「表示する植物」の「絞り込み・並び替え・一括操作」(種類・状態・並び替え・一覧をすべて表示/非表示)を折りたためるようにしました\n・折りたたんだままでも、いま選んでいる条件が横に表示されます'},
+  {id:'v1.11',title:'アップデート v1.11',body:'・設定に「ピンのサイズ」(50〜200%)と「線の太さ」(2〜14px)のスライダーを追加しました\n・動かすと、地図のピンと線の大きさがその場で変わります'},
+  {id:'v1.12',title:'アップデート v1.12',body:'・植物一覧に「ゴミ箱」を追加しました。削除した植物は30日間残り、復元できます\n・登録するときに「開花時期」(開始月〜終了月)を入れられるようになりました\n・「表示する植物」と「植物一覧」に、開花月での絞り込みを追加しました\n・メニューに「データの書き出し」「データの読み込み」を追加しました\n・メニューに「地図を画像で保存」を追加しました。保存する範囲(いま見ている範囲/3km・2km・1km・500m圏)を選べます'},
+  {id:'v1.13',title:'アップデート v1.13',body:'・削除できない不具合を直しました。確認画面をアプリ内の表示に変えたため、プレビューでも削除・復元・読み込みの確認が動きます'},
+  {id:'v1.14',title:'アップデート v1.14',body:'・トーストの表示を、同時に3つまでにしました(4つ目が出るときは、いちばん古いものから消えます)'},
+  {id:'v1.15',title:'アップデート v1.15',body:'・開花時期の絞り込みで、複数の期間を指定できるようになりました(例: 3〜4月と9〜10月)\n・「絞り込み・並び替え・一括操作」「範囲ごとに切り替え」「開花時期で絞り込み」を、1つの折りたたみにまとめました'},
+  {id:'v1.16',title:'アップデート v1.16',body:'・「植物一覧」の絞り込みを、「表示する植物」と同じ構成にしました\n・「絞り込み・並び替え・範囲・開花時期」を1つの折りたたみにまとめ、範囲ごと・開花時期(複数期間)でも一覧を絞り込めます\n・「状態」で、地図に表示中/非表示のものだけを一覧にできます'},
+  {id:'v1.17',title:'アップデート v1.17',body:'・「植物一覧」と「表示する植物」の絞り込みを、最初は折りたたんだ状態で開くようにしました\n・「一覧 / ゴミ箱」の切り替えボタンを小さくしました'},
+  {id:'v1.18',title:'アップデート v1.18',body:'・ゴミ箱まわり(「一覧 / ゴミ箱」の切り替え、「復元」「消す」「ゴミ箱を空にする」)の文字が途中で折り返して崩れないように直しました'},
+  {id:'v1.19',title:'アップデート v1.19',body:'・「植物一覧」の検索欄と「一覧 / ゴミ箱」の切り替えを同じ行にまとめ、切り替えを右上に置きました'},
+  {id:'v1.20',title:'アップデート v1.20',body:'・地図で近くにある同じ名前のピンを、数字つきの1つのピンにまとめて表示するようにしました(タップで拡大、設定でオン/オフ)\n・ヘッダーの右上にアカウントマークを追加しました\n・アカウントの作成・設定、共有マップの画面を追加しました(共有機能は準備中で、まだ使えません)'}
 ];
 if(firstRun)UPDATES.forEach(u=>S.seenUpdates.push(u.id));
 else UPDATES.forEach(u=>{if(!S.seenUpdates.includes(u.id)){S.seenUpdates.push(u.id);addNotice('upd',u.title,u.body)}});
