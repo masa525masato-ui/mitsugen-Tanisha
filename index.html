@@ -171,6 +171,17 @@ button:disabled{opacity:.4;cursor:default}
 .avatar{width:3.2rem;height:3.2rem;border-radius:50%;background:var(--mint);display:grid;place-items:center;flex:none}
 .soon-note{background:#FFF4D1;border:1.5px solid #F2D48A;border-radius:.8rem;padding:.7rem .8rem;line-height:1.7;font-size:.9rem}
 .set .btns .ghost,.set .btns .primary,.soon-note+.btns .ghost,.soon-note+.btns .primary{white-space:nowrap}
+.seg.full.sm,.seg.sm{display:inline-flex;width:auto;padding:.15rem;border-radius:.8rem}
+.seg.full.sm button,.seg.sm button{padding:.25rem .8rem;min-height:2rem;font-size:.8rem;border-radius:.6rem;white-space:nowrap;flex:none}
+.ghost.sm,.primary.sm{padding:.25rem .8rem!important;min-height:2.1rem!important;font-size:.8rem!important;white-space:nowrap;border-width:1.5px}
+.gbtn{width:100%}
+.or{display:flex;align-items:center;gap:.6rem;color:var(--mut);margin:.8rem 0;font-size:.85rem}
+.or:before,.or:after{content:"";flex:1;border-top:1px solid var(--line)}
+.acchead{display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem}
+.avatar{overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.ini{width:100%;height:100%;display:grid;place-items:center;background:var(--honey);color:var(--leaf-d);font-weight:700}
+.avatar.sm{width:2.1rem;height:2.1rem;border:2px solid #fff}
 /* lists */
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem}
 .filters .f{margin:0}
@@ -189,7 +200,8 @@ button:disabled{opacity:.4;cursor:default}
 .card .tx b,.card .tx small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 .empty{text-align:center;color:var(--mut);padding:2rem 1rem;line-height:1.7}
 .nt{position:relative}
-.nt .dot{position:absolute;top:.55rem;right:.6rem;width:.7rem;height:.7rem;border-radius:50%;background:var(--honey)}
+.nt .dot{flex:none;width:.7rem;height:.7rem;border-radius:50%;background:var(--honey)}
+.nmain{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:0;display:flex}
 .nt .tx small.pv{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .chip{display:inline-block;font-size:.72rem;font-weight:700;border-radius:1rem;padding:.05rem .55rem;background:var(--mint);color:var(--leaf-d);margin-right:.35rem}
 .chip.add{background:#DDEFD0}.chip.edit{background:#FFF0C2;color:#7A5600}.chip.del{background:#F7DAD5;color:var(--danger)}.chip.upd{background:#D8E8F7;color:#1F4E7A}
@@ -261,7 +273,7 @@ input[type=range]{width:100%;accent-color:var(--leaf);height:2rem}
 
 <div id="scrim"></div>
 <aside id="drawer" aria-hidden="true">
-  <div class="dh"><svg width="34" height="34" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/></svg><b>みつばち蜜源マップ</b><small>多治見西高等学校 周辺3km ・ v1.20</small></div>
+  <div class="dh"><svg width="34" height="34" viewBox="0 0 24 24"><polygon points="12,1 21.5,6.5 21.5,17.5 12,23 2.5,17.5 2.5,6.5" fill="#F2B01E"/></svg><b>みつばち蜜源マップ</b><small>多治見西高等学校 周辺3km ・ v1.21</small></div>
   <ul>
     <li><button data-go="plants"><span>🌿</span>植物一覧</button></li>
     <li><button data-go="settings"><span>⚙️</span>設定</button></li>
@@ -285,6 +297,8 @@ window.addEventListener('error',function(e){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" crossorigin="anonymous"></script>
 <script>
 try{
 if(!window.L){document.body.insertAdjacentHTML('beforeend','<p style="position:fixed;top:5rem;left:1rem;right:1rem;z-index:9999;background:#fff;padding:1rem;border-radius:1rem">地図ライブラリ(Leaflet)を読み込めませんでした。インターネット接続を確認して、ページを開き直してください。</p>');throw new Error('Leaflet not loaded')}
@@ -294,19 +308,21 @@ const CENTER=[35.351804,137.10176];
 const R=3000;               // 登録できる範囲(m)
 const RINGS=[500,1000,2000,3000];
 const MAX_IMG=5;
+// ★ ログイン機能(Firebase)を使うときは、Firebaseの「ウェブアプリの設定」をここに貼り付けてください。
+const FIREBASE_CONFIG={apiKey:'',authDomain:'',projectId:'',appId:''};
 
 /* ===== 便利関数 ===== */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeColor=c=>/^#[0-9a-f]{6}$/i.test(c)?c:'#F2B01E';
-const fmt=iso=>new Date(iso).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const fmt=iso=>new Date(iso).toLocaleString(S.settings.lang==='en'?'en-US':'ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 /* ===== 保存データ ===== */
 const KEY='mitsugen-map-v1';
-let S={items:[],notices:[],seeded:false,seenUpdates:[],hidden:[],hiddenItems:[],hiddenRanges:[],trash:[],bloomMonth:0,bloomRanges:[],bloomUnset:true,toured:false,settings:{mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true}};
-try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);S=Object.assign(S,d);S.settings=Object.assign({mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true},d.settings)}}catch(e){}
+let S={items:[],notices:[],seeded:false,seenUpdates:[],hidden:[],hiddenItems:[],hiddenRanges:[],trash:[],noticeTrash:[],bloomMonth:0,bloomRanges:[],bloomUnset:true,toured:false,settings:{mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true,lang:'ja'}};
+try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);S=Object.assign(S,d);S.settings=Object.assign({mapType:'normal',font:16,toast:true,pinSize:100,lineWidth:6,cluster:true,lang:'ja'},d.settings)}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){flash('保存できませんでした。画像が多すぎる可能性があります');return false}}
 
 /* ===== 地図 ===== */
@@ -925,28 +941,75 @@ function flash(msg){
   const t=el(`<div class="toast warn" role="alert"></div>`).firstChild;t.textContent=msg;
   showToast(t,3200);
 }
+function trashNotice(id){
+  const n=S.notices.find(x=>x.id===id);if(!n)return;
+  S.notices=S.notices.filter(x=>x.id!==id);
+  S.noticeTrash.unshift(Object.assign({},n,{deletedAt:new Date().toISOString()}));S.noticeTrash=S.noticeTrash.slice(0,100);
+  save();updateBadge();
+}
+function restoreNotice(id){
+  const n=S.noticeTrash.find(x=>x.id===id);if(!n)return;
+  S.noticeTrash=S.noticeTrash.filter(x=>x.id!==id);
+  const c=Object.assign({},n);delete c.deletedAt;
+  S.notices.push(c);S.notices.sort((a,b)=>b.time.localeCompare(a.time));
+  save();updateBadge();
+}
 function openNotices(){
-  const w=el(`
-    <div class="filters">
-      <label class="f">種類<select id="nk"><option value="all">すべて</option>${Object.entries(KINDS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
-      <label class="f">並び替え<select id="ns"><option value="new">新しい順</option><option value="old">古い順</option><option value="unread">未読を先に</option></select></label>
-      <label class="chk wide"><input type="checkbox" id="nu">未読だけ</label>
+  const w=el(`<div class="toprow" style="justify-content:flex-end"><div class="seg full sm" id="ntabs"><button type="button" data-t="list" aria-pressed="true">お知らせ</button><button type="button" data-t="trash" aria-pressed="false">🗑 ゴミ箱 <span id="ntc"></span></button></div></div>
+    <div id="npl">
+      <div class="filters">
+        <label class="f">種類<select id="nk"><option value="all">すべて</option>${Object.entries(KINDS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label>
+        <label class="f">並び替え<select id="ns"><option value="new">新しい順</option><option value="old">古い順</option><option value="unread">未読を先に</option></select></label>
+        <label class="chk wide"><input type="checkbox" id="nu">未読だけ</label>
+      </div>
+      <div class="toprow" style="margin:.2rem 0 .5rem"><div class="cnt" id="ncnt" style="flex:1;margin:0"></div><button class="ghost danger sm" id="nall" type="button">表示中をゴミ箱へ</button></div>
+      <div id="nl"></div>
     </div>
-    <div class="cnt" id="ncnt"></div><div id="nl"></div>`);
+    <div id="ntr" hidden></div>`);
+  let cur=[];
   const draw=()=>{
     const k=$('#nk',w).value,so=$('#ns',w).value,u=$('#nu',w).checked;
     const a=S.notices.filter(n=>(k==='all'||n.kind===k)&&(!u||!n.read));
     a.sort((x,y)=>so==='old'?x.time.localeCompare(y.time):so==='unread'?((x.read-y.read)||y.time.localeCompare(x.time)):y.time.localeCompare(x.time));
-    $('#ncnt',w).textContent=`${a.length}件`;
+    cur=a;
+    $('#ncnt',w).textContent=`${a.length}件`;$('#nall',w).hidden=!a.length;
+    $('#ntc',w).textContent=S.noticeTrash.length?`(${S.noticeTrash.length})`:'';
     const nl=$('#nl',w);nl.innerHTML='';
     if(!a.length){nl.innerHTML=`<div class="empty">${S.notices.length?'条件に合うお知らせがありません。':'お知らせはまだありません。'}</div>`;return}
     a.forEach(n=>{
-      const b=el(`<button class="card nt">${n.read?'':'<span class="dot"></span>'}<div class="tx"><b>${esc(n.title)}</b><small><span class="chip ${n.kind}">${KINDS[n.kind]}</span>${fmt(n.time)}</small><small class="pv">${esc(n.body)}</small></div></button>`).firstChild;
-      b.onclick=()=>openNotice(n,draw);
-      nl.appendChild(b);
+      const row=el(`<div class="card nt">${n.read?'':'<span class="dot"></span>'}<button class="nmain" type="button"><div class="tx"><b>${esc(n.title)}</b><small><span class="chip ${n.kind}">${KINDS[n.kind]}</span>${fmt(n.time)}</small><small class="pv">${esc(n.body)}</small></div></button><button class="ghost danger go" type="button" data-a="d">削除</button></div>`).firstChild;
+      $('.nmain',row).onclick=()=>openNotice(n,draw);
+      $('[data-a=d]',row).onclick=()=>{trashNotice(n.id);draw()};
+      nl.appendChild(row);
     });
   };
-  ['input','change'].forEach(ev=>w.addEventListener(ev,draw));
+  const drawTrash=()=>{
+    const tr=$('#ntr',w);tr.innerHTML='';
+    $('#ntc',w).textContent=S.noticeTrash.length?`(${S.noticeTrash.length})`:'';
+    if(!S.noticeTrash.length){tr.innerHTML='<div class="empty">ゴミ箱は空です。<br>削除したお知らせは30日間ここに残り、復元できます。</div>';return}
+    const top=el(`<div class="toprow" style="justify-content:flex-end;margin-bottom:.5rem"><button class="ghost danger sm" id="nte" type="button">ゴミ箱を空にする</button></div>`).firstChild;
+    $('#nte',top).onclick=async()=>{if(!await askConfirm('お知らせのゴミ箱の中身をすべて完全に削除します。元に戻せません。','空にする'))return;S.noticeTrash=[];save();drawTrash();draw()};
+    tr.appendChild(top);
+    S.noticeTrash.forEach(n=>{
+      const days=Math.max(0,30-Math.floor((Date.now()-new Date(n.deletedAt).getTime())/864e5));
+      const c=el(`<div class="card"><div class="tx"><b>${esc(n.title)}</b><small><span class="chip ${n.kind}">${KINDS[n.kind]}</span>削除 ${fmt(n.deletedAt)} ・ あと${days}日</small></div><button class="ghost go" data-a="r" type="button">復元</button><button class="ghost danger go" data-a="d" type="button">消す</button></div>`).firstChild;
+      $('[data-a=r]',c).onclick=()=>{restoreNotice(n.id);drawTrash();draw()};
+      $('[data-a=d]',c).onclick=async()=>{if(!await askConfirm(`「${n.title}」を完全に削除します。元に戻せません。`,'完全に削除'))return;S.noticeTrash=S.noticeTrash.filter(x=>x.id!==n.id);save();drawTrash()};
+      tr.appendChild(c);
+    });
+  };
+  $('#ntabs',w).onclick=e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#ntabs button',w).forEach(x=>x.setAttribute('aria-pressed',x===b));
+    $('#npl',w).hidden=b.dataset.t!=='list';$('#ntr',w).hidden=b.dataset.t!=='trash';
+    if(b.dataset.t==='trash')drawTrash();else draw();
+  };
+  $('#nall',w).onclick=async()=>{
+    if(!cur.length)return;
+    if(!await askConfirm(`表示中の${cur.length}件をゴミ箱に移動しますか?`,'ゴミ箱に移動'))return;
+    cur.slice().forEach(n=>trashNotice(n.id));draw();
+  };
+  ['input','change'].forEach(ev=>w.addEventListener(ev,e=>{if(e.target.matches('#nk,#ns,#nu'))draw()}));
   draw();openPop({title:'お知らせ',body:w});
 }
 function openNotice(n,after){
@@ -956,7 +1019,10 @@ function openNotice(n,after){
     const b=el('<button class="primary">地図で見る</button>').firstChild;
     b.onclick=()=>{closeAllPops();focusItem(n.itemId)};w.appendChild(b);
   }
-  openPop({title:n.title,body:w,cls:'big',onClose:()=>after&&after()});
+  const bar=el(`<div class="btns" style="margin-top:1rem"><span class="sp"></span><button class="ghost danger sm" id="nd" type="button">削除</button></div>`).firstChild;
+  $('#nd',bar).onclick=()=>{trashNotice(n.id);pop.close();info('お知らせをゴミ箱に移動しました')};
+  w.appendChild(bar);
+  const pop=openPop({title:n.title,body:w,cls:'big',onClose:()=>after&&after()});
 }
 
 /* ===== 設定 ===== */
@@ -966,6 +1032,7 @@ function openSettings(){
   const w=el(`
     <div class="set"><h3>マップの種類</h3><div class="seg full" id="mt"><button data-t="normal" aria-pressed="${s.mapType==='normal'}">普通</button><button data-t="sat" aria-pressed="${s.mapType==='sat'}">衛星</button></div></div>
     <div class="set"><h3>文字のサイズ <span id="fv" style="font-weight:400">${s.font}px</span></h3><input type="range" id="fs" min="12" max="24" step="1" value="${s.font}"><p style="margin:.3rem 0 0">この大きさで文字が表示されます。</p></div>
+    <div class="set"><h3>言語</h3><div class="seg full" id="lg"><button data-l="ja" aria-pressed="${s.lang!=='en'}">日本語</button><button data-l="en" aria-pressed="${s.lang==='en'}">English</button></div></div>
     <div class="set"><h3>ピンのサイズ <span id="pv" style="font-weight:400">${s.pinSize}%</span></h3><input type="range" id="ps" min="50" max="200" step="10" value="${s.pinSize}"></div>
     <div class="set"><h3>線の太さ <span id="lv" style="font-weight:400">${s.lineWidth}px</span></h3><input type="range" id="lw" min="2" max="14" step="1" value="${s.lineWidth}"></div>
     <div class="set"><div class="row"><h3 style="margin:0">お知らせのトースト表示</h3><label class="sw"><input type="checkbox" id="ts" ${s.toast?'checked':''}><i></i></label></div></div>
@@ -974,6 +1041,7 @@ function openSettings(){
   $('#mt',w).onclick=e=>{const b=e.target.closest('button');if(!b)return;s.mapType=b.dataset.t;setMapType(s.mapType);$$('#mt button',w).forEach(x=>x.setAttribute('aria-pressed',x===b));save()};
   $('#fs',w).oninput=e=>{s.font=+e.target.value;$('#fv',w).textContent=s.font+'px';applyFont()};
   $('#fs',w).onchange=save;
+  $('#lg',w).onclick=e=>{const b=e.target.closest('button');if(!b)return;setLang(b.dataset.l);$$('#lg button',w).forEach(x=>x.setAttribute('aria-pressed',x===b))};
   $('#ps',w).oninput=e=>{s.pinSize=+e.target.value;$('#pv',w).textContent=s.pinSize+'%';S.items.forEach(drawItem);applyFilter()};
   $('#ps',w).onchange=save;
   $('#lw',w).oninput=e=>{s.lineWidth=+e.target.value;$('#lv',w).textContent=s.lineWidth+'px';S.items.forEach(drawItem);applyFilter()};
@@ -1019,7 +1087,7 @@ const STEPS=[
   {sel:'#mode',mode:'view',t:'右下で「閲覧」と「編集」を切り替えます。植物を登録できるのは「編集」のときだけです。'},
   {sel:'#tools',mode:'edit',t:'編集では「点」か「線」を選びます。線は直線か曲線を選べます。地図をタップして場所を決め、出てきた画面に植物の情報を入れて「決定」を押します。曲線は「開始点→曲げる点→終わる点」の順にタップします。'},
   {sel:'#btn-bell',mode:'view',t:'植物の追加や編集、アップデートのお知らせがここに届きます。数字は未読の数です。'},
-  {sel:'#btn-account',mode:'view',t:'右上のアカウントマークから、アカウントの作成や設定の画面を開けます。共有機能は準備中で、まだ使えません。'}
+  {sel:'#btn-account',mode:'view',t:'右上のアカウントマークから、ログインやアカウントの設定ができます(Google・メールアドレス)。共同作成はまだ使えません。'}
 ];
 function startTour(){
   closeAllPops();closeDrawer();
@@ -1051,20 +1119,129 @@ function restoreItem(id){
   addNotice('add',`「${it.name}」を復元しました`,'ゴミ箱から元に戻しました。',it.id);
 }
 
-/* ===== アカウント(準備中: まだ使えません) ===== */
+/* ===== アカウント(Firebase: Google / メールアドレス) ===== */
+const T=(ja,en)=>(S.settings.lang==='en'?en:ja);
+const ACC_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>';
+let auth=null,user=null,accountRefresh=null;
+const AUTH_ERR={
+  'auth/invalid-email':['メールアドレスの形式が正しくありません','The email address is not valid'],
+  'auth/missing-email':['メールアドレスを入力してください','Enter your email address'],
+  'auth/missing-password':['パスワードを入力してください','Enter your password'],
+  'auth/user-not-found':['このメールアドレスのアカウントがありません','No account found for this email'],
+  'auth/wrong-password':['パスワードが違います','Wrong password'],
+  'auth/invalid-credential':['メールアドレスかパスワードが違います','Wrong email or password'],
+  'auth/email-already-in-use':['このメールアドレスは、すでに登録されています','This email is already registered'],
+  'auth/weak-password':['パスワードは6文字以上にしてください','Use a password of at least 6 characters'],
+  'auth/popup-closed-by-user':['ログインがキャンセルされました','Sign-in was cancelled'],
+  'auth/cancelled-popup-request':['ログインがキャンセルされました','Sign-in was cancelled'],
+  'auth/popup-blocked':['ポップアップがブロックされました。許可してもう一度お試しください','The pop-up was blocked. Allow it and try again'],
+  'auth/network-request-failed':['通信できませんでした。ネットワークを確認してください','Network error. Check your connection'],
+  'auth/too-many-requests':['試行回数が多すぎます。しばらくしてからお試しください','Too many attempts. Try again later'],
+  'auth/requires-recent-login':['安全のため、もう一度ログインしてから操作してください','For security, sign in again and retry'],
+  'auth/unauthorized-domain':['このサイトのドメインが、Firebaseの「承認済みドメイン」に登録されていません','This site\'s domain is not in Firebase "Authorized domains"'],
+  'auth/operation-not-allowed':['このログイン方法が、Firebaseで有効になっていません','This sign-in method is not enabled in Firebase'],
+  'auth/invalid-api-key':['FirebaseのAPIキーが正しくありません','The Firebase API key is not valid']
+};
+const authErr=e=>{const x=AUTH_ERR[e&&e.code];return x?T(x[0],x[1]):T('エラーが発生しました','An error occurred')+` (${(e&&e.code)||e})`};
+const initialOf=u=>((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
+function avatarInto(box,u){
+  box.innerHTML='';
+  if(u.photoURL){const im=new Image();im.alt='';im.referrerPolicy='no-referrer';im.src=u.photoURL;box.appendChild(im)}
+  else{const sp=document.createElement('span');sp.className='ini';sp.textContent=initialOf(u);box.appendChild(sp)}
+}
+function updateAccountBtn(){
+  const b=$('#btn-account');
+  if(user){
+    const box=document.createElement('span');box.className='avatar sm';avatarInto(box,user);
+    b.innerHTML='';b.appendChild(box);
+    b.setAttribute('aria-label',T('アカウント','Account')+': '+(user.displayName||user.email||''));
+  }else{b.innerHTML=ACC_ICON;b.setAttribute('aria-label',T('アカウント','Account'))}
+}
+function initAuth(){
+  if(!(window.firebase&&FIREBASE_CONFIG.apiKey))return;
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();auth.languageCode=S.settings.lang||'ja';
+    auth.onAuthStateChanged(u=>{user=u;updateAccountBtn();if(accountRefresh)accountRefresh()});
+    auth.getRedirectResult().catch(e=>flash(authErr(e)));
+  }catch(e){auth=null;flash(T('Firebaseの設定を読み込めませんでした','Could not load the Firebase settings'))}
+}
 function openAccount(){
-  const w=el(`<div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem"><div class="avatar"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2F5D3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></div><div><b>ゲスト</b><br><small style="color:var(--mut)">ログインしていません</small></div></div>
-    <div class="soon-note">🔒 共有機能は準備中です。いまは、登録した内容はこの端末のブラウザの中にだけ保存されます。アカウントを作ると、複数人で同じ地図に登録・保存できるようになる予定です。</div>
-    <div class="btns" style="margin:.9rem 0"><button class="primary" type="button" disabled>ログイン</button><button class="ghost" type="button" disabled>アカウントを作成</button></div>
-    <div class="set"><h3>アカウント設定 <span class="chip">準備中</span></h3>
-      <label class="f">表示名<input type="text" disabled placeholder="例:たろう"></label>
-      <label class="f">メールアドレス<input type="text" disabled placeholder="example@mail.com"></label>
-      <button class="ghost" type="button" disabled>パスワードを変更</button></div>
-    <div class="set"><h3>共有マップ <span class="chip">準備中</span></h3>
-      <label class="f">自分の権限<select disabled><option>編集できる</option><option>閲覧のみ</option></select></label>
-      <div class="btns"><button class="ghost" type="button" disabled>招待リンクを作る</button><button class="ghost" type="button" disabled>メンバーを見る</button></div></div>
-    <div class="set"><div class="btns"><button class="ghost danger" type="button" disabled>ログアウト</button><button class="ghost danger" type="button" disabled>アカウントを削除</button></div></div>`);
-  openPop({title:'アカウント',body:w});
+  let mode='login';
+  const ready=!!auth,w=document.createElement('div');
+  const dis=ready?'':'disabled';
+  const field=(id,label,type,ph,ac)=>`<label class="f">${label}<input id="${id}" type="${type}" placeholder="${ph}" autocomplete="${ac}" ${dis}></label>`;
+  const viewOut=()=>{
+    const signup=mode==='signup';
+    const h=el(`${ready?'':`<div class="soon-note" style="margin-bottom:.9rem">${T('🔒 ログイン機能は、Firebase の設定が終わると使えます。index.html の先頭にある FIREBASE_CONFIG に、設定を貼り付けてください。','🔒 Sign-in becomes available once Firebase is set up. Paste your settings into FIREBASE_CONFIG near the top of index.html.')}</div>`}
+      <button class="ghost gbtn" id="ag" type="button" ${dis}>${signup?T('Googleでアカウントを作成','Sign up with Google'):T('Googleでログイン','Sign in with Google')}</button>
+      <div class="or"><span>${T('または','or')}</span></div>
+      <div class="seg full sm" id="am" style="margin-bottom:.8rem"><button data-m="login" aria-pressed="${!signup}" type="button">${T('メールでログイン','Email sign-in')}</button><button data-m="signup" aria-pressed="${signup}" type="button">${T('メールで作成','Email sign-up')}</button></div>
+      ${signup?field('an',T('表示名(あとで変えられます)','Display name (can be changed later)'),'text',T('例:たろう','e.g. Taro'),'name'):''}
+      ${field('ae',T('メールアドレス','Email'),'email','example@mail.com','email')}
+      ${field('ap',T('パスワード(6文字以上)','Password (6+ characters)'),'password','••••••',signup?'new-password':'current-password')}
+      <div class="btns"><button class="ghost sm" id="af" type="button" ${ready&&!signup?'':'hidden'}>${T('パスワードを忘れた','Forgot password')}</button><span class="sp"></span><button class="primary" id="as" type="button" ${dis}>${signup?T('アカウントを作成','Create account'):T('ログイン','Sign in')}</button></div>
+      <div class="set" style="margin-top:1.2rem"><h3>${T('共有マップ','Shared map')} <span class="chip">${T('準備中','Coming soon')}</span></h3><div class="soon-note">${T('共同作成はまだ使えません。','Collaboration is not available yet.')}</div></div>`);
+    $('#am',h).onclick=e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;render()};
+    if(ready){
+      $('#ag',h).onclick=async()=>{
+        const p=new firebase.auth.GoogleAuthProvider();
+        try{await auth.signInWithPopup(p);info(T('ログインしました','Signed in'))}
+        catch(e){
+          if(e&&(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')){try{await auth.signInWithRedirect(p);return}catch(e2){e=e2}}
+          flash(authErr(e));
+        }
+      };
+      $('#af',h).onclick=async()=>{
+        const email=$('#ae',h).value.trim();
+        if(!email){flash(T('メールアドレスを入力してください','Enter your email address'));return}
+        try{await auth.sendPasswordResetEmail(email);info(T('パスワード再設定のメールを送りました','Password reset email sent'))}catch(e){flash(authErr(e))}
+      };
+      $('#as',h).onclick=async()=>{
+        const email=$('#ae',h).value.trim(),pw=$('#ap',h).value,btn=$('#as',h);
+        btn.disabled=true;
+        try{
+          if(signup){
+            const c=await auth.createUserWithEmailAndPassword(email,pw),name=$('#an',h).value.trim();
+            if(name)await c.user.updateProfile({displayName:name});
+            try{await c.user.sendEmailVerification()}catch(_){}
+            user=auth.currentUser;updateAccountBtn();
+            info(T('アカウントを作成しました。確認メールを送りました','Account created. A verification email was sent.'));
+          }else{await auth.signInWithEmailAndPassword(email,pw);info(T('ログインしました','Signed in'))}
+        }catch(e){flash(authErr(e))}
+        finally{btn.disabled=false}
+      };
+    }
+    return h;
+  };
+  const viewIn=()=>{
+    const isPw=user.providerData.some(p=>p.providerId==='password');
+    const isG=user.providerData.some(p=>p.providerId==='google.com');
+    const h=el(`<div class="acchead"><div class="avatar" id="av"></div><div style="min-width:0"><b id="un"></b><br><small id="um" style="color:var(--mut)"></small><br><small style="color:var(--mut)">${T('ログイン方法','Signed in with')}: ${isG?'Google':T('メールアドレス','Email')}</small></div></div>
+      <div class="set"><h3>${T('アカウント設定','Account settings')}</h3>
+        <label class="f">${T('表示名','Display name')}<input type="text" id="dn" maxlength="40"></label>
+        <div class="btns" style="margin-bottom:.8rem"><span class="sp"></span><button class="ghost sm" id="sn" type="button">${T('表示名を保存','Save name')}</button></div>
+        ${isPw?`<div class="row" style="margin:.4rem 0"><span>${T('メールの確認','Email verification')}: ${user.emailVerified?T('確認済み','verified'):T('未確認','not verified')}</span>${user.emailVerified?'':`<button class="ghost sm" id="sv" type="button">${T('確認メールを送る','Send email')}</button>`}</div>
+        <button class="ghost sm" id="sp" type="button">${T('パスワード再設定メールを送る','Send password reset email')}</button>`:''}
+      </div>
+      <div class="set"><h3>${T('共有マップ','Shared map')} <span class="chip">${T('準備中','Coming soon')}</span></h3><div class="soon-note">${T('共同作成はまだ使えません。','Collaboration is not available yet.')}</div></div>
+      <div class="set"><div class="btns"><button class="ghost sm" id="so" type="button">${T('ログアウト','Sign out')}</button><button class="ghost danger sm" id="sd" type="button">${T('アカウントを削除','Delete account')}</button></div></div>`);
+    $('#un',h).textContent=user.displayName||T('名前未設定','No name');$('#um',h).textContent=user.email||'';
+    $('#dn',h).value=user.displayName||'';avatarInto($('#av',h),user);
+    $('#sn',h).onclick=async()=>{try{await user.updateProfile({displayName:$('#dn',h).value.trim()});user=auth.currentUser;updateAccountBtn();render();info(T('表示名を保存しました','Name saved'))}catch(e){flash(authErr(e))}};
+    if(isPw){
+      const sv=$('#sv',h);if(sv)sv.onclick=async()=>{try{await user.sendEmailVerification();info(T('確認メールを送りました','Verification email sent'))}catch(e){flash(authErr(e))}};
+      $('#sp',h).onclick=async()=>{try{await auth.sendPasswordResetEmail(user.email);info(T('パスワード再設定のメールを送りました','Password reset email sent'))}catch(e){flash(authErr(e))}};
+    }
+    $('#so',h).onclick=async()=>{try{await auth.signOut();info(T('ログアウトしました','Signed out'))}catch(e){flash(authErr(e))}};
+    $('#sd',h).onclick=async()=>{
+      if(!await askConfirm(T('アカウントを削除します。元に戻せません。(登録した植物は、この端末に残ります)','Delete your account? This cannot be undone. (Your plants stay on this device.)'),T('削除する','Delete')))return;
+      try{await user.delete();info(T('アカウントを削除しました','Account deleted'))}catch(e){flash(authErr(e))}
+    };
+    return h;
+  };
+  const render=()=>{w.innerHTML='';w.appendChild(user?viewIn():viewOut())};
+  openPop({title:T('アカウント','Account'),body:w,onClose:()=>{accountRefresh=null}});
+  accountRefresh=render;render();
 }
 
 /* ===== 共通 ===== */
@@ -1260,11 +1437,126 @@ function openShot(){
   openPop({title:'地図を画像で保存',body:w,onClose:()=>{if(curUrl)URL.revokeObjectURL(curUrl)}});
 }
 
+/* ===== 言語(日本語 / English) ===== */
+const EN={"ここからメニューを開きます。植物一覧・設定・お知らせ・使い方に移動できます。": "This opens the menu: plant list, settings, notices and how to use.", "ホームは地図です。多治見西高校を中心に、500m・1km・2km・3kmを点線の円で表しています。3kmより外は暗くなり、登録できません。": "The home screen is the map. Dashed circles show 500 m, 1 km, 2 km and 3 km around Tajimi Nishi High School. Outside 3 km is darkened and nothing can be added there.", "左上の「フィルター」で、地図に表示する植物を名前ごとに選べます。": "Use \"Filter\" at the top left to choose which plants appear on the map, by name.", "現在地ボタンで、いまいる場所を地図に表示します(位置情報の許可が必要です)。もう一度押すと現在地に戻ります。": "The location button shows where you are on the map (location permission needed). Tap again to return to your location.", "右下で「閲覧」と「編集」を切り替えます。植物を登録できるのは「編集」のときだけです。": "Switch between \"View\" and \"Edit\" at the bottom right. You can only add plants in \"Edit\".", "編集では「点」か「線」を選びます。線は直線か曲線を選べます。地図をタップして場所を決め、出てきた画面に植物の情報を入れて「決定」を押します。曲線は「開始点→曲げる点→終わる点」の順にタップします。": "In Edit, choose \"Point\" or \"Line\" (straight or curve). Tap the map to place it, fill in the plant details, then press \"Save\". For a curve, tap the start, a bend point, then the end.", "植物の追加や編集、アップデートのお知らせがここに届きます。数字は未読の数です。": "New pins, edits and updates appear here as notices. The number is your unread count.", "右上のアカウントマークから、ログインやアカウントの設定ができます(Google・メールアドレス)。共同作成はまだ使えません。": "Use the account icon at the top right to sign in or manage your account (Google or email). Shared editing is not available yet.", "みつばち蜜源マップ": "Honey Source Map", "多治見西高等学校": "Tajimi Nishi High School", "多治見西高等学校 周辺3km": "Tajimi Nishi High School – 3 km area", "校": "S", "国土地理院": "GSI Japan", "メニューを開く": "Open menu", "お知らせ": "Notices", "アカウント": "Account", "表示する植物を選ぶ": "Choose plants to show", "やり直す": "Start over", "現在地を表示": "Show my location", "閉じる": "Close", "画像を拡大": "Enlarge photo", "画像を削除": "Remove photo", "この期間を削除": "Remove this period", "表示する植物": "Plants on the map", "▽ フィルター": "▽ Filter", "● 点": "● Point", "╱ 線": "╱ Line", "直線": "Straight", "曲線": "Curve", "点": "Point", "線": "Line", "現在地に登録": "Add at my location", "閲覧": "View", "編集": "Edit", "植物一覧": "Plant list", "設定": "Settings", "使い方": "How to use", "データの書き出し": "Export data", "データの読み込み": "Import data", "地図を画像で保存": "Save map as image", "地図ライブラリ(Leaflet)を読み込めませんでした。インターネット接続を確認して、ページを開き直してください。": "Could not load the map library (Leaflet). Check your internet connection and reload the page.", "保存できませんでした。画像が多すぎる可能性があります": "Could not save. There may be too many images.", "地図画像を読み込めません。通信を確認してください": "Cannot load map images. Check your connection.", "未設定": "Not set", "〜500m": "Up to 500 m", "500m〜1km": "500 m – 1 km", "1〜2km": "1 – 2 km", "2〜3km": "2 – 3 km", "範囲ごとに切り替え(学校からの距離)": "Toggle by range (distance from school)", "すべて表示": "Show all", "開花時期で絞り込み": "Filter by bloom period", "指定した期間のどれかに咲くものだけ表示します(11月〜2月のように年をまたぐ指定もできます)": "Shows only plants that bloom in any of the periods you set (a period like Nov–Feb is fine).", "＋ 期間を追加": "＋ Add period", "クリア": "Clear", "開花時期が未設定のものも表示": "Also show plants with no bloom period", "期間が指定されていません(すべて表示)": "No period set (showing all)", "期間は6つまでです": "Up to 6 periods", "検索": "Search", "植物名で探す": "Search by name", "植物名・メモで探す": "Search names and notes", "絞り込み・並び替え・範囲・開花時期": "Filter, sort, range, bloom period", "種類": "Type", "すべて": "All", "点があるもの": "Has points", "線があるもの": "Has lines", "状態": "Status", "表示中": "Shown", "非表示": "Hidden", "地図に表示中": "Shown on map", "地図で非表示": "Hidden on map", "並び替え": "Sort", "名前順": "By name", "件数が多い順": "Most items first", "新しい順": "Newest first", "古い順": "Oldest first", "未読を先に": "Unread first", "未読だけ": "Unread only", "画像あり": "With photos", "一覧をすべて表示": "Show all listed", "一覧をすべて非表示": "Hide all listed", "条件なし": "No filters", "条件に合う植物がありません。": "No plants match.", "まだ植物が登録されていません。": "No plants yet.", "編集に切り替えて、地図をタップして追加しましょう。": "Switch to Edit and tap the map to add one.", "範囲で非表示": "hidden by range", "見る": "View", "地図をタップして点を登録": "Tap the map to add a point", "1点目をタップ": "Tap the 1st point", "2点目をタップ": "Tap the 2nd point", "開始点をタップ": "Tap the start point", "曲げる点をタップ": "Tap a bend point", "終わる点をタップ": "Tap the end point", "内容を入力してください": "Fill in the details", "3km圏外には登録できません": "Cannot add outside the 3 km area", "位置情報の利用が許可されていません。ブラウザの設定で許可してください": "Location access is not allowed. Allow it in your browser settings.", "現在地を取得できませんでした": "Could not get your location", "この端末では位置情報が使えません": "Location is not available on this device", "現在地は3km圏外です": "Your location is outside the 3 km area", "現在地が3km圏外のため登録できません": "Cannot add: your location is outside the 3 km area", "植物名": "Plant name", "例:ナナカマド": "e.g. Rowan", "ピンの色": "Pin color", "開花時期": "Bloom period", "その他": "Notes", "気づいたことなど": "Observations, etc.", "地図のピンをドラッグすると位置を変えられます(3km圏内)": "Drag the pin on the map to move it (within 3 km).", "＋ 曲がる点を追加": "＋ Add bend point", "選んだ点を削除": "Delete selected point", "削除": "Delete", "決定": "Save", "画像": "Photo", "画像を読み込めませんでした": "Could not load the photo", "ゴミ箱に移動": "Move to trash", "(植物一覧のゴミ箱から、30日以内なら復元できます)": "(You can restore it from the plant list trash within 30 days.)", "植物一覧の「ゴミ箱」から、30日以内なら復元できます。": "You can restore it from the plant list trash within 30 days.", "植物名を入力してください": "Enter a plant name", "位置や形を変更しました。": "Moved or reshaped.", "一覧": "List", "ゴミ箱": "Trash", "ゴミ箱は空です。": "The trash is empty.", "削除した植物は30日間ここに残り、復元できます。": "Deleted plants stay here for 30 days and can be restored.", "削除したお知らせは30日間ここに残り、復元できます。": "Deleted notices stay here for 30 days and can be restored.", "ゴミ箱を空にする": "Empty trash", "ゴミ箱の中身をすべて完全に削除します。元に戻せません。": "Permanently delete everything in the trash? This cannot be undone.", "お知らせのゴミ箱の中身をすべて完全に削除します。元に戻せません。": "Permanently delete everything in the notice trash? This cannot be undone.", "空にする": "Empty", "復元": "Restore", "消す": "Delete", "完全に削除": "Delete permanently", "追加": "Add", "アップデート": "Update", "条件に合うお知らせがありません。": "No notices match.", "お知らせはまだありません。": "No notices yet.", "地図で見る": "View on map", "表示中をゴミ箱へ": "Move shown to trash", "お知らせをゴミ箱に移動しました": "Notice moved to the trash", "マップの種類": "Map type", "普通": "Standard", "衛星": "Satellite", "文字のサイズ": "Text size", "この大きさで文字が表示されます。": "Text is shown at this size.", "ピンのサイズ": "Pin size", "線の太さ": "Line width", "お知らせのトースト表示": "Show notice pop-ups", "近い同じ名前のピンをまとめる": "Group nearby pins with the same name", "言語": "Language", "スキップ": "Skip", "次へ": "Next", "完了": "Done", "ゴミ箱から元に戻しました。": "Restored from the trash.", "キャンセル": "Cancel", "確認": "Confirm", "ファイルに書き出す": "Export to file", "ファイルに書き出しました": "Exported to a file", "「データの書き出し」で保存したファイル(.json)を選んでください。": "Choose a file (.json) saved with \"Export data\".", "ファイルが大きすぎます(30MBまで)": "File too large (30 MB max)", "ファイルを読み込めませんでした。書き出したファイルか確認してください。": "Could not read the file. Check that it is an exported file.", "このアプリで書き出したファイルではありません。": "This is not a file exported from this app.", "いまのデータに追加する": "Add to current data", "いまのデータを置き換える": "Replace current data", "読み込む": "Import", "いまのデータを消して、ファイルの内容に置き換えます。よろしいですか?": "Replace your current data with the file contents?", "置き換える": "Replace", "データを読み込みました": "Data imported", "保存する範囲": "Area to save", "いま見ている範囲": "Current view", "3km圏ぜんぶ": "Whole 3 km area", "2km圏": "2 km area", "1km圏": "1 km area", "500m圏": "500 m area", "画像の大きさ": "Image size", "小(軽い)": "Small (light)", "標準": "Standard", "大(きれい)": "Large (sharp)", "含めるもの": "Include", "ピンと線": "Pins and lines", "距離の円とラベル": "Distance circles and labels", "3km外を暗くする": "Darken outside 3 km", "画像を作る": "Create image", "作成中…": "Creating…", "画像を長押しして写真に追加もできます": "You can also long-press the image to add it to Photos", "画像を保存する": "Save image", "画像を保存しました": "Image saved", "地図画像を取得できませんでした。通信を確認してください": "Could not get map images. Check your connection.", "画像を作れませんでした(地図データの取得制限の可能性があります)": "Could not create the image (map data may be restricted).", "みつばち蜜源マップへようこそ": "Welcome to the Honey Source Map", "多治見西高校から3km圏内の蜜源植物を、点と線で登録できます。": "You can register nectar plants within 3 km of Tajimi Nishi High School as points and lines.", "「編集」に切り替えて地図をタップすると登録できます。使い方はメニューの「使い方」から見られます。": "Switch to \"Edit\" and tap the map to add one. See \"How to use\" in the menu.", "・アカウントを使えるようにしました。Googleまたはメールアドレスで、アカウントの作成とログインができます(共同作成はまだ使えません)": "・Accounts are now available. You can create an account and sign in with Google or email (shared editing is not available yet).", "・お知らせを削除できるようにしました。削除したお知らせは「ゴミ箱」から30日間復元できます": "・Notices can now be deleted. Deleted notices can be restored from the trash for 30 days.", "・設定に「言語」を追加しました(日本語 / English)": "・Added \"Language\" to the settings (日本語 / English).", "・ゴミ箱まわりのボタンを小さめにしました": "・Made the trash-related buttons smaller.", "丸をドラッグして形を変えられます(緑=始点、赤=終点、黄=曲がる点)。線をタップするか下のボタンで曲がる点を増やせます。黄色の点をタップして選ぶと削除できます。矢印の丸をドラッグすると全体が動きます(3km圏内)": "Drag the dots to reshape (green = start, red = end, yellow = bend point). Tap the line or use the button below to add bend points. Tap a yellow dot to select it and delete it. Drag the arrow dot to move the whole line (within 3 km).", "緑と赤の丸をドラッグして端を動かせます。矢印の丸をドラッグすると全体が動きます(3km圏内)": "Drag the green and red dots to move the ends. Drag the arrow dot to move the whole line (within 3 km)."};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const KEN={'点':'point','直線':'straight line','曲線':'curve'};
+const NEN={'追加':'Add','編集':'Edit','削除':'Delete','アップデート':'Update'};
+const mon=n=>MON[(+n-1)%12]||n;
+const pl=(n,w)=>`${n} ${w}${n==1?'':'s'}`;
+const RULES=[
+  [/^(\d+)件$/,m=>pl(m[1],'item')],
+  [/^(\d+)種類$/,m=>pl(m[1],'kind')],
+  [/^約(\d+)m$/,m=>`~${m[1]} m`],
+  [/^画像(\d+)$/,m=>pl(m[1],'photo')],
+  [/^開花(\d+)月$/,m=>`Blooms ${mon(m[1])}`],
+  [/^開花(\d+)〜(\d+)月$/,m=>`Blooms ${mon(m[1])}–${mon(m[2])}`],
+  [/^(\d+)月$/,m=>mon(m[1])],
+  [/^(\d+)期間$/,m=>pl(m[1],'period')],
+  [/^開花 (\d+)期間$/,m=>`Bloom: ${pl(m[1],'period')}`],
+  [/^範囲 (\d+)$/,m=>`Range ${m[1]}`],
+  [/^非表示 (\d+)$/,m=>`Hidden ${m[1]}`],
+  [/^非表示の設定 (\d+)$/,m=>`Hidden settings: ${m[1]}`],
+  [/^(\d+)件非表示$/,m=>`${m[1]} hidden`],
+  [/^あと(\d+)日$/,m=>`${pl(m[1],'day')} left`],
+  [/^削除 (.+)$/,m=>`Deleted ${m[1]}`],
+  [/^今月\((\d+)月\)だけ$/,m=>`This month only (${mon(m[1])})`],
+  [/^画像を追加\((\d+)枚まで\)$/,m=>`Add photos (up to ${m[1]})`],
+  [/^画像は(\d+)枚までです$/,m=>`Up to ${m[1]} photos`],
+  [/^曲がる点は(\d+)個までです$/,m=>`Up to ${m[1]} bend points`],
+  [/^(点|直線|曲線)を登録$/,m=>`Add ${KEN[m[1]]}`],
+  [/^「(.*)」をゴミ箱に移動しますか\?$/,m=>`Move "${m[1]}" to the trash?`],
+  [/^「(.*)」をゴミ箱に移動しました$/,m=>`Moved "${m[1]}" to the trash`],
+  [/^(点|直線|曲線)をゴミ箱に移動しました。$/,m=>`Moved the ${KEN[m[1]]} to the trash.`],
+  [/^「(.*)」を追加しました$/,m=>`Added "${m[1]}"`],
+  [/^(点|直線|曲線)として登録しました。$/,m=>`Registered as a ${KEN[m[1]]}.`],
+  [/^学校から約(\d+)mの位置です。$/,m=>`About ${m[1]} m from the school.`],
+  [/^メモ: (.*)$/,m=>`Notes: ${m[1]}`],
+  [/^「(.*)」を編集しました$/,m=>`Edited "${m[1]}"`],
+  [/^(点|直線|曲線)の内容を更新しました。$/,m=>`Updated the ${KEN[m[1]]}.`],
+  [/^「(.*)」を復元しました$/,m=>`Restored "${m[1]}"`],
+  [/^「(.*)」を完全に削除します。元に戻せません。$/,m=>`Permanently delete "${m[1]}"? This cannot be undone.`],
+  [/^(追加|編集|削除|アップデート)のお知らせ$/,m=>`${NEN[m[1]]} notice`],
+  [/^アップデート (v[\d.]+)$/,m=>`Update ${m[1]}`],
+  [/^表示中の(\d+)件をゴミ箱に移動しますか\?$/,m=>`Move the ${pl(m[1],'notice')} shown to the trash?`],
+  [/^植物 (\d+)件$/,m=>`Plants: ${m[1]}`],
+  [/^ゴミ箱 (\d+)件$/,m=>`Trash: ${m[1]}`],
+  [/^読み込めなかった (\d+)件$/,m=>`Skipped: ${m[1]}`],
+  [/^登録した植物\((\d+)件\)とゴミ箱\((\d+)件\)を、1つのファイルに書き出します。画像も入ります。バックアップや、別の端末への引っ越しに使えます。$/,m=>`Exports your ${pl(m[1],'plant')} and ${pl(m[2],'trashed item')} to one file, including photos. Use it as a backup or to move to another device.`],
+  [/^植物(\d+)件、ゴミ箱(\d+)件を読み込みました。\((追加|置き換え)\)$/,m=>`Imported ${pl(m[1],'plant')} and ${pl(m[2],'trashed item')}. (${m[3]==='追加'?'added':'replaced'})`]
+];
+let lang=S.settings.lang==='en'?'en':'ja';
+const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+function trSeg(t){
+  const pm=t.match(/^((?:[\p{Extended_Pictographic}\u200d\ufe0f]+\s*)+)([\s\S]+)$/u);
+  if(pm)return pm[1]+trSeg(pm[2]);
+  if(has(EN,t))return EN[t];
+  for(const[re,f]of RULES){const m=t.match(re);if(m)return f(m)}
+  return t;
+}
+function trLine(line){
+  const core=line.trim();if(!core)return line;
+  const lead=line.slice(0,line.indexOf(core)),trail=line.slice(line.indexOf(core)+core.length);
+  if(has(EN,core))return lead+EN[core]+trail;
+  return lead+core.split(' ・ ').map(trSeg).join(' · ')+trail;
+}
+const trText=str=>str.split('\n').map(trLine).join('\n');
+const trRec=new WeakMap(),trAttr=new WeakMap();
+function trNode(n){
+  if(n.nodeType===3){
+    const p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))return;
+    let rec=trRec.get(n);
+    if(!(rec&&n.nodeValue===rec.out))rec={src:n.nodeValue,out:n.nodeValue};
+    const out=lang==='en'?trText(rec.src):rec.src;
+    rec.out=out;trRec.set(n,rec);
+    if(n.nodeValue!==out)n.nodeValue=out;
+  }else if(n.nodeType===1){
+    if(/^(SCRIPT|STYLE)$/.test(n.nodeName))return;
+    let rec=trAttr.get(n);if(!rec){rec={};trAttr.set(n,rec)}
+    for(const a of['placeholder','aria-label']){
+      if(!n.hasAttribute(a))continue;
+      const cur=n.getAttribute(a),r=rec[a];
+      const src=(r&&cur===r.out)?r.src:cur;
+      const out=lang==='en'?trText(src):src;
+      rec[a]={src,out};
+      if(cur!==out)n.setAttribute(a,out);
+    }
+  }
+}
+function trAll(root=document.body){
+  const wk=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);
+  let n=wk.currentNode;
+  do{trNode(n)}while((n=wk.nextNode()));
+}
+function trSub(node){
+  if(node.nodeType===3||node.nodeType===1){trNode(node);if(node.nodeType===1)trAll(node)}
+}
+function initLang(){
+  document.documentElement.lang=lang;
+  document.title=lang==='en'?'Honey Source Map':'みつばち蜜源マップ';
+  new MutationObserver(recs=>{
+    if(lang!=='en')return;
+    for(const r of recs){
+      if(r.type==='childList')r.addedNodes.forEach(trSub);
+      else trNode(r.target);
+    }
+  }).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['placeholder','aria-label']});
+  if(lang==='en')trAll();
+}
+function setLang(l){
+  lang=l==='en'?'en':'ja';S.settings.lang=lang;save();
+  document.documentElement.lang=lang;
+  document.title=lang==='en'?'Honey Source Map':'みつばち蜜源マップ';
+  if(auth)auth.languageCode=lang;
+  trAll();updateAccountBtn();
+}
+
 /* ===== 起動 ===== */
 applyFont();setMapType(S.settings.mapType);
 if(!Array.isArray(S.bloomRanges))S.bloomRanges=[];
+if(!Array.isArray(S.noticeTrash))S.noticeTrash=[];
 if(S.bloomMonth){S.bloomRanges=[{from:S.bloomMonth,to:S.bloomMonth}];S.bloomMonth=0}
-{const lim=Date.now()-30*864e5,n=S.trash.length;S.trash=S.trash.filter(t=>!t.deletedAt||new Date(t.deletedAt).getTime()>lim);if(S.trash.length!==n)save()}
+{const lim=Date.now()-30*864e5,n=S.trash.length;S.trash=S.trash.filter(t=>!t.deletedAt||new Date(t.deletedAt).getTime()>lim);S.noticeTrash=(S.noticeTrash||[]).filter(t=>!t.deletedAt||new Date(t.deletedAt).getTime()>lim);if(S.trash.length!==n)save()}
 S.items.forEach(drawItem);applyFilter();
 const firstRun=!S.seeded;
 if(!S.seeded){S.seeded=true;addNotice('upd','みつばち蜜源マップへようこそ','多治見西高校から3km圏内の蜜源植物を、点と線で登録できます。\n\n「編集」に切り替えて地図をタップすると登録できます。使い方はメニューの「使い方」から見られます。',null,true)}
@@ -1288,11 +1580,13 @@ const UPDATES=[
   {id:'v1.17',title:'アップデート v1.17',body:'・「植物一覧」と「表示する植物」の絞り込みを、最初は折りたたんだ状態で開くようにしました\n・「一覧 / ゴミ箱」の切り替えボタンを小さくしました'},
   {id:'v1.18',title:'アップデート v1.18',body:'・ゴミ箱まわり(「一覧 / ゴミ箱」の切り替え、「復元」「消す」「ゴミ箱を空にする」)の文字が途中で折り返して崩れないように直しました'},
   {id:'v1.19',title:'アップデート v1.19',body:'・「植物一覧」の検索欄と「一覧 / ゴミ箱」の切り替えを同じ行にまとめ、切り替えを右上に置きました'},
-  {id:'v1.20',title:'アップデート v1.20',body:'・地図で近くにある同じ名前のピンを、数字つきの1つのピンにまとめて表示するようにしました(タップで拡大、設定でオン/オフ)\n・ヘッダーの右上にアカウントマークを追加しました\n・アカウントの作成・設定、共有マップの画面を追加しました(共有機能は準備中で、まだ使えません)'}
+  {id:'v1.20',title:'アップデート v1.20',body:'・地図で近くにある同じ名前のピンを、数字つきの1つのピンにまとめて表示するようにしました(タップで拡大、設定でオン/オフ)\n・ヘッダーの右上にアカウントマークを追加しました\n・アカウントの作成・設定、共有マップの画面を追加しました(共有機能は準備中で、まだ使えません)'},
+  {id:'v1.21',title:'アップデート v1.21',body:'・アカウントを使えるようにしました。Googleまたはメールアドレスで、アカウントの作成とログインができます(共同作成はまだ使えません)\n・お知らせを削除できるようにしました。削除したお知らせは「ゴミ箱」から30日間復元できます\n・設定に「言語」を追加しました(日本語 / English)\n・ゴミ箱まわりのボタンを小さめにしました'}
 ];
 if(firstRun)UPDATES.forEach(u=>S.seenUpdates.push(u.id));
 else UPDATES.forEach(u=>{if(!S.seenUpdates.includes(u.id)){S.seenUpdates.push(u.id);addNotice('upd',u.title,u.body)}});
 save();
+initLang();initAuth();
 updateBadge();updateFilterBadge();setMode('view');
 if(!S.toured)setTimeout(startTour,700);
 }catch(err){
